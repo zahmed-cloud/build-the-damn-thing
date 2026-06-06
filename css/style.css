@@ -241,7 +241,7 @@ nav.hud-bar.scrolled {
   position: relative;
   overflow: hidden;
   border-bottom: 4px solid var(--ink);
-  background: var(--sky);
+  background: #1a2a4a;
 }
 
 .hero-canvas {
