@@ -28,40 +28,41 @@ export function initEmail() {
 }
 
 /**
- * Marquee — waits for Press Start 2P to load before starting.
+ * Marquee — rock-solid initialisation.
  *
- * Root cause of the fragmentation bug: the CSS animation's
- * translateX(-50%) is computed from the track's width, which
- * depends on font metrics. If the animation starts while the
- * fallback font is active, the -50% offset is wrong. When the
- * real font loads and glyphs are wider, items reflow and wrap.
- *
- * Fix: inject content immediately (so the browser starts loading
- * the font), but only apply the animation AFTER fonts are ready.
+ * 1. Inject content immediately (triggers font download).
+ * 2. Wait for the SPECIFIC pixel font to load (not just fonts.ready
+ *    which can resolve early if the browser deprioritises the font).
+ * 3. Force a layout read THEN apply animation.
+ * 4. Fallback: if font API unavailable or times out, start after 2s.
  */
 export function initMarquee() {
   var mq = document.getElementById('mq');
   if (!mq) return;
 
-  /* Inject items immediately — triggers font load */
   var s = '';
   for (var i = 0; i < 10; i++) {
     s += '<span class="marquee-item">BUILD THE DAMN THING</span>';
   }
   mq.innerHTML = s + s;
 
-  /* Start animation only after fonts are loaded and metrics are final */
+  var started = false;
+
   function startAnimation() {
-    /* Force a layout read so the browser computes the final width
-       with the loaded font before the animation begins */
+    if (started) return;
+    started = true;
+    /* Force reflow so browser measures final font metrics */
     void mq.offsetWidth;
     mq.style.animation = 'marquee-scroll 45s linear infinite';
   }
 
-  if (document.fonts && document.fonts.ready) {
+  /* Try to wait for the specific pixel font */
+  if (document.fonts && document.fonts.load) {
+    document.fonts.load("48px 'Press Start 2P'").then(startAnimation).catch(startAnimation);
+  } else if (document.fonts && document.fonts.ready) {
     document.fonts.ready.then(startAnimation);
-  } else {
-    /* Fallback: wait for window load (fonts should be done by then) */
-    window.addEventListener('load', startAnimation);
   }
+
+  /* Absolute fallback: start after 2 seconds no matter what */
+  setTimeout(startAnimation, 2000);
 }

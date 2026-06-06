@@ -1652,4 +1652,130 @@ footer {
   .hero {
     min-height: 500px;
   }
+
+  #stageCanvas {
+    height: 160px;
+  }
+
+  #catchCanvas {
+    height: 280px;
+  }
+
+  .catch-hud {
+    gap: 12px;
+    font-size: 8px;
+  }
+}
+
+
+/* --- Responsive: 400px (small phones) --- */
+
+@media (max-width: 400px) {
+  .wrap {
+    padding: 0 12px;
+  }
+
+  .sec {
+    padding: 44px 0;
+  }
+
+  .email-in {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .email-row {
+    flex-direction: column;
+  }
+
+  .email-row .pixbtn {
+    width: 100%;
+    text-align: center;
+  }
+
+  .weeks-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 4px;
+    padding: 8px;
+  }
+
+  .wk-s {
+    font-size: 10px;
+  }
+
+  .wk-n {
+    font-size: 4px;
+  }
+
+  .arc-tabs {
+    gap: 6px;
+  }
+
+  .arc-tab {
+    font-size: 8px;
+    padding: 10px 10px;
+  }
+
+  .game-box {
+    padding: 16px;
+  }
+
+  .hero-title {
+    font-size: clamp(22px, 7vw, 40px);
+    white-space: normal;
+  }
+
+  .hero-eyebrow {
+    font-size: 7px;
+    padding: 7px 10px;
+  }
+
+  .hero-tag {
+    font-size: 13px;
+  }
+
+  .press-start {
+    font-size: 9px;
+    padding: 12px 20px;
+  }
+
+  .quote-box {
+    padding: 28px 20px;
+  }
+
+  .who-grid {
+    gap: 28px;
+  }
+
+  .week-detail.open {
+    max-height: 280px;
+  }
+
+  .foot-grid {
+    gap: 28px;
+  }
+
+  .cards-grid {
+    border-width: 2px;
+  }
+
+  .card-body {
+    padding: 18px 16px;
+  }
+
+  .card-name {
+    font-size: 18px;
+  }
+
+  #stageCanvas {
+    height: 140px;
+  }
+
+  #catchCanvas {
+    height: 240px;
+  }
+
+  .split-card {
+    padding: 24px 20px;
+  }
 }
