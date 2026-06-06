@@ -213,8 +213,8 @@ export function initHero() {
   cv.addEventListener('click', function(e) {
     if (!car) return;
     var r = cv.getBoundingClientRect(), cx = e.clientX - r.left, cy = e.clientY - r.top;
-    /* exit button: top-left corner during gameplay */
-    if (playing && cx < u * 12 && cy < u * 6) { endGame(); return; }
+    /* exit button: top-left corner during gameplay (mobile only) */
+    if (playing && isMobile() && cx < u * 12 && cy < u * 6) { endGame(); return; }
     if (playing) return;
     if (Math.abs(cx - (car.x + u * 7)) < u * 16 && Math.abs(cy - (roadY - u * 2)) < u * 10) startGame();
   });
@@ -504,15 +504,17 @@ export function initHero() {
     ctx.fillStyle = tl <= 5 ? '#e0603a' : '#f2ede1';
     ctx.font = Math.min(u * 0.9, 10) + "px 'Press Start 2P',monospace";
     ctx.fillText(tl + 's', W - u * 3, u * 5);
-    /* EXIT button — top left, always visible during gameplay */
-    ctx.fillStyle = 'rgba(0,0,0,0.5)';
-    ctx.fillRect(u * 1.5, u * 2, u * 10, u * 4);
-    ctx.strokeStyle = 'rgba(242,237,225,0.2)'; ctx.lineWidth = 1;
-    ctx.strokeRect(u * 1.5, u * 2, u * 10, u * 4);
-    ctx.fillStyle = '#f2ede1';
-    ctx.font = Math.min(u * 1, 10) + "px 'Press Start 2P',monospace";
-    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    ctx.fillText('EXIT', u * 6.5, u * 4);
+    /* EXIT button — mobile only (desktop uses ESC key) */
+    if (isMobile()) {
+      ctx.fillStyle = 'rgba(0,0,0,0.5)';
+      ctx.fillRect(u * 1.5, u * 2, u * 10, u * 4);
+      ctx.strokeStyle = 'rgba(242,237,225,0.2)'; ctx.lineWidth = 1;
+      ctx.strokeRect(u * 1.5, u * 2, u * 10, u * 4);
+      ctx.fillStyle = '#f2ede1';
+      ctx.font = Math.min(u * 1, 10) + "px 'Press Start 2P',monospace";
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText('EXIT', u * 6.5, u * 4);
+    }
     if (isMobile()) {
       ctx.globalAlpha = 0.025; ctx.fillStyle = '#fff';
       ctx.fillRect(0, roadY, W * 0.33, H - roadY); ctx.fillRect(W * 0.67, roadY, W * 0.33, H - roadY);
