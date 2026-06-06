@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Build The Damn Thing — Learn AI Agents From Scratch</title>
+  <meta name="description" content="21-week public challenge to learn and build AI agents from scratch. $10K goal. One new agent shipped every week. Come watch, come play.">
+  <meta property="og:title" content="Build The Damn Thing">
+  <meta property="og:description" content="Learn AI agents from scratch. $10K in 21 weeks. Building live.">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Build The Damn Thing">
+  <meta name="twitter:description" content="Learn AI agents from scratch. $10K in 21 weeks. Building live.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23e0603a'/><rect x='8' y='6' width='4' height='20' fill='%23f2ede1'/><rect x='12' y='6' width='8' height='3' fill='%23f2ede1'/><rect x='20' y='9' width='3' height='4' fill='%23f2ede1'/><rect x='12' y='13' width='8' height='3' fill='%23f2ede1'/><rect x='20' y='16' width='3' height='4' fill='%23f2ede1'/><rect x='12' y='23' width='8' height='3' fill='%23f2ede1'/><rect x='20' y='20' width='3' height='3' fill='%23f2ede1'/></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Pixelify+Sans:wght@400;500;600;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Skip link for accessibility -->
+  <a href="#arcade" class="skip-link">Skip to game zone</a>
+
+  <!-- ===== HUD BAR ===== -->
+  <nav class="hud-bar" role="navigation" aria-label="Game HUD">
+    <div class="hud-grp">
+      <span class="hearts" aria-label="3 lives remaining">
+        <svg width="15" height="13" viewBox="0 0 7 6" aria-hidden="true"><g fill="#e0603a"><rect x="1" width="2" height="1"/><rect x="4" width="2" height="1"/><rect y="1" width="7" height="2"/><rect x="1" y="3" width="5" height="1"/><rect x="2" y="4" width="3" height="1"/><rect x="3" y="5" width="1" height="1"/></g></svg>
+        <svg width="15" height="13" viewBox="0 0 7 6" aria-hidden="true"><g fill="#e0603a"><rect x="1" width="2" height="1"/><rect x="4" width="2" height="1"/><rect y="1" width="7" height="2"/><rect x="1" y="3" width="5" height="1"/><rect x="2" y="4" width="3" height="1"/><rect x="3" y="5" width="1" height="1"/></g></svg>
+        <svg width="15" height="13" viewBox="0 0 7 6" aria-hidden="true"><g fill="#e0603a"><rect x="1" width="2" height="1"/><rect x="4" width="2" height="1"/><rect y="1" width="7" height="2"/><rect x="1" y="3" width="5" height="1"/><rect x="2" y="4" width="3" height="1"/><rect x="3" y="5" width="1" height="1"/></g></svg>
+      </span>
+      <span class="hud-name">BUILD THE DAMN THING</span>
+    </div>
+    <div class="hud-grp">
+      <span class="hud-stat" id="hudLV" aria-live="polite">LV 00</span>
+      <span class="hud-stat" id="hudMoney" aria-live="polite">$0/$10K</span>
+      <button class="hud-snd" id="hudSnd" title="Toggle sound on/off" aria-label="Toggle sound">&#128266;</button>
+      <a href="#email-section" class="hud-start">&#9654; FOLLOW</a>
+    </div>
+  </nav>
+
+  <!-- ===== HERO ===== -->
+  <section class="hero" aria-label="Hero banner">
+    <canvas class="hero-canvas" id="heroCanvas" aria-label="Interactive pixel art scene with walking character. Click to interact."></canvas>
+    <div class="hero-ui">
+      <div class="hero-eyebrow">&#9654; NEW CHALLENGE &middot; STARTS JUL 1 2026</div>
+      <h1 class="hero-title">BUILD THE<br>DAMN THING</h1>
+      <p class="hero-tag">learning AI agents from scratch. <span>$10K in 21 weeks.</span> building live.</p>
+      <a href="#arcade" class="press-start">&#9654; PRESS START</a>
+      <div class="hero-poke">psst &middot; tap the little guy</div>
+    </div>
+    <div class="hero-hint">scroll down to play &darr;</div>
+  </section>
+
+  <!-- ===== THE CHALLENGE / THE BET ===== -->
+  <section class="sec">
+    <div class="wrap">
+      <div class="split">
+        <div class="split-card">
+          <span class="tag">&#9654; THE CHALLENGE</span>
+          <h3>learn it live</h3>
+          <p>learn to build AI agents from scratch, fully in public. 21 weeks. one new agent shipped every single week. everything straight from the raw docs. no fluff, no shortcuts, no pretending i already know it all.</p>
+        </div>
+        <div class="split-card">
+          <span class="tag">&#9654; THE BET</span>
+          <h3>make 10 grand doing it</h3>
+          <p>make $10k inside 21 weeks while learning. a founder who already builds, now picking up a new craft out loud. building live, failing live, getting paid live. starts jul 1 2026.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== ARCADE / GAME ZONE ===== -->
+  <section class="sec arcade" id="arcade" aria-label="Game Zone">
+    <div class="wrap">
+      <div class="arc-intro">
+        <span class="eyebrow">&#9654; THE GAME ZONE</span>
+        <h2>come play. build stuff.</h2>
+        <p>this is a playground, not a pitch. mess around, build a fake agent, catch some leads, solve a puzzle. none of it is real, all of it teaches you how agents actually work.</p>
+      </div>
+
+      <div class="arc-tabs" role="tablist">
+        <button class="arc-tab on" data-p="pBuild" role="tab" aria-selected="true">&#129302; BUILD AN AGENT</button>
+        <button class="arc-tab" data-p="pCatch" role="tab" aria-selected="false">&#9889; CATCH THE LEADS</button>
+        <button class="arc-tab" data-p="pSolve" role="tab" aria-selected="false">&#129504; SOLVE IT</button>
+      </div>
+
+      <!-- Build an Agent -->
+      <div class="arc-panel on" id="pBuild" role="tabpanel">
+        <div class="game-box">
+          <div class="game-h">build an agent</div>
+          <div class="game-sub">tap pixel tools to chain them up, hit run, and watch the little guy ship it. just for fun.</div>
+          <div class="build-grid">
+            <div>
+              <div class="palette" id="palette"></div>
+            </div>
+            <div class="stage-wrap">
+              <canvas id="stageCanvas" aria-label="Agent building stage"></canvas>
+              <div class="belt" id="belt"></div>
+              <div class="build-ctrls">
+                <button class="pixbtn green" id="btnRun">&#9654; RUN</button>
+                <button class="pixbtn" id="btnClear">CLEAR</button>
+              </div>
+              <div id="playResult" aria-live="polite"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Catch the Leads -->
+      <div class="arc-panel" id="pCatch" role="tabpanel">
+        <div class="game-box">
+          <div class="game-h">catch the leads</div>
+          <div class="game-sub">click the gold $ leads as they drop. dodge the spam &#10005;. you have 20 seconds. this is what speed-to-lead feels like.</div>
+          <div class="catch-hud">
+            <span>SCORE <b id="catchScore">0</b></span>
+            <span>TIME <b id="catchTime">20</b></span>
+            <span>BEST <b id="catchBest">0</b></span>
+            <span>COMBO <b id="catchCombo">0</b></span>
+          </div>
+          <canvas id="catchCanvas" aria-label="Catch the leads game"></canvas>
+          <div class="catch-foot">
+            <button class="pixbtn coral" id="catchBtn">&#9654; START</button>
+            <span id="catchResult"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Solve It -->
+      <div class="arc-panel" id="pSolve" role="tabpanel">
+        <div class="game-box">
+          <div class="game-h">solve it</div>
+          <div class="game-sub">real agent problems, picked apart. choose the smart move and learn why it wins.</div>
+          <div class="solve-grid">
+            <div class="solve-canvas-wrap">
+              <canvas id="solveCanvas" aria-label="Quiz mascot"></canvas>
+              <div class="solve-bubble" id="solveBubble">your move?</div>
+            </div>
+            <div>
+              <div class="solve-q" id="solveQ"></div>
+              <div class="solve-opts" id="solveOpts"></div>
+              <div class="solve-lesson" id="solveLesson"></div>
+              <div class="solve-foot">
+                <button class="pixbtn" id="solveNext" disabled>NEXT &#9654;</button>
+                <span class="solve-count" id="solveCount"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== WHAT IS AN AI AGENT ===== -->
+  <section class="sec">
+    <div class="wrap">
+      <div class="quote-box">
+        <span class="lbl">&#9654; WHAT IS AN AI AGENT?</span>
+        <p>software that can think, decide and take action on its own. you give it a goal, it figures out the steps, picks its tools, and gets the job done while you sleep. that is the thing being built here. every week. from scratch.<span class="cursor"></span></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== THE AGENTS ===== -->
+  <section class="sec" id="agents">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="eyebrow">&#9654; THE AGENTS</span>
+        <h2>the build list</h2>
+      </div>
+      <div class="cards-grid">
+        <div class="card">
+          <div class="card-thumb">
+            <span class="flow-node">CALL</span><span class="flow-dash">&#9656;&#9656;</span>
+            <span class="flow-node ag">AGENT</span><span class="flow-dash">&#9656;&#9656;</span>
+            <span class="flow-node">BOOK</span>
+          </div>
+          <div class="card-body">
+            <span class="card-tag">AGENT 01 &middot; PLANNED</span>
+            <span class="card-date">TARGETING &mdash; WEEK 3</span>
+            <div class="card-name">hvac speed-to-lead agent</div>
+            <p>when a customer calls or messages an hvac company, the agent answers instantly, qualifies the job, and books it on the calendar. no missed leads, day or night.</p>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-thumb">
+            <span class="flow-node">SCRAPE</span><span class="flow-dash">&#9656;&#9656;</span>
+            <span class="flow-node ag">AGENT</span><span class="flow-dash">&#9656;&#9656;</span>
+            <span class="flow-node">SCORE</span>
+          </div>
+          <div class="card-body">
+            <span class="card-tag">AGENT 02 &middot; PLANNED</span>
+            <span class="card-date">TARGETING &mdash; WEEK 5</span>
+            <div class="card-name">lead generation agent</div>
+            <p>finds, scores and routes leads. pipeline running without you lifting a finger.</p>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-thumb">
+            <span class="flow-node">INBOX</span><span class="flow-dash">&#9656;&#9656;</span>
+            <span class="flow-node ag">AGENT</span><span class="flow-dash">&#9656;&#9656;</span>
+            <span class="flow-node">REPLY</span>
+          </div>
+          <div class="card-body">
+            <span class="card-tag">AGENT 03 &middot; PLANNED</span>
+            <span class="card-date">TARGETING &mdash; WEEK 7</span>
+            <div class="card-name">email support agent</div>
+            <p>reads incoming emails, decides what to do, replies or flags. most of the inbox runs itself.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PLAYER INPUT ===== -->
+  <section class="sec">
+    <div class="wrap ask">
+      <span class="eyebrow">&#9654; PLAYER INPUT</span>
+      <h2>what should i build next?</h2>
+      <p>got an agent idea, a problem worth solving, or just wanna follow along? send it over. i actually read these.</p>
+      <a href="https://t.me/getascent" target="_blank" rel="noopener noreferrer" class="pixbtn coral">&#9654; MESSAGE ME ON TELEGRAM</a>
+    </div>
+  </section>
+
+  <!-- ===== WHO ===== -->
+  <section class="sec" id="who">
+    <div class="wrap who-grid">
+      <div>
+        <span class="eyebrow">&#9654; WHO IS BEHIND THIS</span>
+        <h2>Ahmed.<br>your biz growth mate.</h2>
+        <div class="chips">
+          <span class="chip w">Founder</span>
+          <span class="chip w">B2B Growth Partner</span>
+          <span class="chip w">Full Stack Dev</span>
+          <span class="chip">WealthOS</span>
+          <span class="chip">Ascent</span>
+          <span class="chip g">Building AI Agents</span>
+          <span class="chip g">Anthropic CPN</span>
+        </div>
+      </div>
+      <div>
+        <p class="who-p">founder and B2B growth partner behind <strong>Ascent</strong>, which has worked with 20+ businesses including SalesCoachPro, LaunchPoint Lab, App Marketing Assassins, GlassHouse and ClearCycle Partners.</p>
+        <p class="who-p">also built <strong>WealthOS</strong> solo from scratch, got it into Microsoft for Startups, and is a full stack developer. <strong>official Anthropic CPN member.</strong></p>
+        <p class="who-p">AI agents are the new bet. learning them properly, in public, and shipping a new one every week. this isn't a polished course or a fake guru flex. it's one builder going all in out loud. if it works, you'll see exactly how. if it flops, you'll see that too.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== LEVEL MAP ===== -->
+  <section class="sec" id="journey">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="eyebrow">&#9654; THE LEVEL MAP</span>
+        <h2>21 weeks. one agent each.</h2>
+      </div>
+      <div class="weeks-grid" id="weeksGrid"></div>
+      <canvas id="weekCanvas"></canvas>
+      <div class="weeks-legend">
+        <span><i style="background:#34a96a"></i>up next</span>
+        <span><i style="background:#20201e;border:1px solid #e0603a"></i>agent drop</span>
+        <span><i style="background:#20201e;border:1px solid rgba(242,237,225,.13)"></i>locked</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== EMAIL / SAVE PROGRESS ===== -->
+  <section class="sec" id="email-section" style="border-bottom:none">
+    <div class="wrap">
+      <div class="email-box">
+        <span class="eyebrow">&#9654; SAVE YOUR PROGRESS</span>
+        <h2>get the weekly build</h2>
+        <p>every agent, every win, every faceplant. straight to your inbox, once a week.</p>
+        <div class="email-row">
+          <input class="email-in" type="email" placeholder="YOUR EMAIL" id="emailIn" aria-label="Your email address">
+          <button class="pixbtn green" id="emailBtn">&#9654; JOIN</button>
+        </div>
+        <div id="emailMsg" style="font-family:var(--pix);font-size:9px;color:var(--green);margin-top:16px;min-height:14px" aria-live="polite"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FOOTER ===== -->
+  <footer>
+    <div class="wrap">
+      <div class="foot-grid">
+        <div>
+          <div class="foot-name">Build The Damn Thing</div>
+          <p class="foot-blurb">one builder learning AI agents from scratch, in public, shipping one a week for 21 weeks. come watch, come play.</p>
+        </div>
+        <div class="foot-col">
+          <h4>FOLLOW</h4>
+          <a href="https://linkedin.com/in/getascent" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+          <a href="https://tiktok.com/@build.the.damn.th" target="_blank" rel="noopener noreferrer">TikTok</a>
+          <a href="https://ahext.substack.com" target="_blank" rel="noopener noreferrer">Substack</a>
+          <a href="https://t.me/getascent" target="_blank" rel="noopener noreferrer">Telegram</a>
+        </div>
+        <div class="foot-col">
+          <h4>BUILD</h4>
+          <a href="https://github.com/zahmed-cloud" target="_blank" rel="noopener noreferrer">GitHub</a>
+          <a href="#arcade">The Game Zone</a>
+          <a href="#agents">The Agents</a>
+          <a href="#journey">21 Weeks</a>
+        </div>
+        <div class="foot-col">
+          <h4>ELSEWHERE</h4>
+          <a href="https://getascent.co" target="_blank" rel="noopener noreferrer">Ascent</a>
+          <a href="https://getwealthos.app" target="_blank" rel="noopener noreferrer">WealthOS</a>
+          <a href="#who">About Ahmed</a>
+        </div>
+      </div>
+      <div class="marquee" aria-hidden="true">
+        <div class="marquee-track" id="mq"></div>
+      </div>
+      <div class="foot-bottom">
+        <span>&copy; 2026 BUILD THE DAMN THING &middot; BY AHMED</span>
+        <div class="socials">
+          <a href="https://linkedin.com/in/getascent" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">in</a>
+          <a href="https://tiktok.com/@build.the.damn.th" target="_blank" rel="noopener noreferrer" aria-label="TikTok">tt</a>
+          <a href="https://t.me/getascent" target="_blank" rel="noopener noreferrer" aria-label="Telegram">tg</a>
+          <a href="https://github.com/zahmed-cloud" target="_blank" rel="noopener noreferrer" aria-label="GitHub">gh</a>
+          <a href="https://ahext.substack.com" target="_blank" rel="noopener noreferrer" aria-label="Substack">sub</a>
+          <a href="https://getascent.co" target="_blank" rel="noopener noreferrer" aria-label="Ascent">as</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Toast notification container -->
+  <div id="toast" role="alert"></div>
+
+  <!-- Module entry point -->
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
