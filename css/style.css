@@ -1338,8 +1338,10 @@ footer {
 
 .marquee-track {
   display: inline-flex;
-  animation: marquee-scroll 45s linear infinite;
+  flex-wrap: nowrap;
+  white-space: nowrap;
   will-change: transform;
+  /* animation applied by JS after fonts load — see email.js */
 }
 
 .marquee-item {
