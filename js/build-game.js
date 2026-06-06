@@ -132,7 +132,12 @@ export function initBuildGame() {
     say(ln);
     SND.win();
     if (builds === 1) achieve('first_agent', 'FIRST AGENT SHIPPED');
-    else toast('AGENT SHIPPED \u2014 +' + amt + ' XP');
+    var msgs = ['shipped. nice one.', 'agent deployed. keep building.', 'another one shipped.', 'you shipped something today.'];
+    toast(msgs[(Math.random() * msgs.length) | 0] + ' +' + amt + ' XP');
+    /* scroll email CTA into view after 3 builds */
+    if (builds === 3) {
+      setTimeout(function() { toast('enjoying this? follow the 21-week build below \u2193'); }, 2000);
+    }
     running = false;
   }
 

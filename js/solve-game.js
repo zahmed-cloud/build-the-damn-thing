@@ -125,27 +125,25 @@ export function initSolveGame() {
     oEl.innerHTML = '';
     lEl.textContent = '';
 
-    const msg = document.createElement('div');
+    var msg = document.createElement('div');
     msg.className = 'solve-end';
     msg.textContent = win
-      ? 'bloody hell, you actually get this agent stuff. respect mate.'
-      : 'yeah nah, have another crack. you will get it, easy.';
+      ? 'you actually get this. respect. follow the 21-week build.'
+      : 'have another crack. you will get it.';
     oEl.appendChild(msg);
 
-    const row = document.createElement('div');
+    var row = document.createElement('div');
     row.className = 'solve-end-btns';
 
-    const a1 = document.createElement('a');
-    a1.href = 'https://t.me/getascent';
-    a1.target = '_blank';
-    a1.rel = 'noopener noreferrer';
-    a1.className = 'pixbtn coral';
-    a1.innerHTML = '\u25b6 FOLLOW THE JOURNEY';
+    var a1 = document.createElement('a');
+    a1.href = '#email-section';
+    a1.className = 'pixbtn green';
+    a1.innerHTML = '\u25b6 FOLLOW THE BUILD';
 
-    const a2 = document.createElement('button');
+    var a2 = document.createElement('button');
     a2.className = 'pixbtn';
     a2.textContent = 'PLAY AGAIN';
-    a2.onclick = () => { idx = 0; solved = 0; render(); };
+    a2.onclick = function() { idx = 0; solved = 0; render(); };
 
     row.appendChild(a1);
     row.appendChild(a2);
@@ -158,7 +156,7 @@ export function initSolveGame() {
     pose = win ? 'happy' : 'idle';
     poseT = win ? 170 : 0;
 
-    if (win) { achieve('quiz_ace', 'QUIZ ACE \u2014 4+ CORRECT'); SND.win(); }
+    if (win) { achieve('quiz_ace', 'QUIZ ACE'); SND.win(); }
   }
 
   /* --- next button --- */

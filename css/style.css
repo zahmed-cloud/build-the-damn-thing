@@ -539,11 +539,12 @@ nav.hud-bar.scrolled {
   flex-direction: column;
   align-items: center;
   gap: 7px;
-  padding: 13px 8px;
+  padding: 14px 10px;
   border: 2px solid var(--line);
   background: var(--bg2);
   cursor: pointer;
   position: relative;
+  min-height: 48px;
   transition: .1s;
 }
 
@@ -623,10 +624,11 @@ nav.hud-bar.scrolled {
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 8px 10px;
+  padding: 10px 12px;
   border: 2px solid var(--coral);
   background: var(--bg3);
   cursor: pointer;
+  min-height: 44px;
   transition: .12s;
 }
 
@@ -778,11 +780,12 @@ nav.hud-bar.scrolled {
   text-align: left;
   font-family: var(--body);
   font-size: 14.5px;
-  padding: 13px 16px;
+  padding: 14px 16px;
   border: 2px solid var(--line);
   background: var(--bg2);
   color: var(--cream);
   cursor: pointer;
+  min-height: 48px;
   transition: .12s;
 }
 
@@ -1372,8 +1375,8 @@ footer {
 }
 
 .socials a {
-  width: 34px;
-  height: 34px;
+  width: 40px;
+  height: 40px;
   border: 2px solid rgba(242, 237, 225, .22);
   display: flex;
   align-items: center;
@@ -1671,8 +1674,29 @@ footer {
 
   .catch-hud {
     gap: 12px;
-    font-size: 8px;
+    font-size: 9px;
   }
+
+  /* boost small text for mobile readability */
+  .eyebrow { font-size: 8px; }
+  .wk-n { font-size: 6px; }
+  .wd-label, .wd-status, .da-label, .da-sub { font-size: 8px; }
+  .flow-node { font-size: 8px; }
+  .card-tag, .card-date { font-size: 9px; }
+  #toast { font-size: 10px; padding: 14px 20px; }
+  #playResult { font-size: 9px; }
+  .belt-empty { font-size: 9px; }
+  .tn { font-size: 9px; }
+  .hero-poke { font-size: 9px; }
+  .hero-hint { font-size: 9px; }
+  .foot-col h4 { font-size: 9px; }
+  .solve-lesson { font-size: 10px; }
+  .solve-diff { font-size: 9px; }
+  #catchResult { font-size: 10px; }
+  #emailMsg { font-size: 10px; }
+
+  /* bigger social links for touch */
+  .socials a { width: 44px; height: 44px; font-size: 14px; }
 }
 
 

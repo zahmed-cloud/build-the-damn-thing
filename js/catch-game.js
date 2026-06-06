@@ -106,15 +106,13 @@ export function initCatchGame() {
     bEl.textContent = best;
     const cash = score * 40;
     GAME.addCash(cash);
-    let msg = 'time! caught ' + score + ' leads = $' + cash + ' (pretend).';
-    if (maxCombo >= 5) msg += ' best combo: x' + maxCombo + '!';
-    msg += score > 8 ? ' huge.' : ' go again.';
+    var msg = score > 8 ? 'speed-to-lead unlocked. +' + cash + ' XP' : 'caught ' + score + ' leads. +' + cash + ' XP. go again.';
+    if (maxCombo >= 5) msg += ' best combo: x' + maxCombo;
     rEl.textContent = msg;
     btn.disabled = false; btn.textContent = '\u25b6 PLAY AGAIN';
-    say(score > 8 ? 'huge!' : 'again ay');
-    if (score >= 15) { achieve('lead_master', 'LEAD MASTER \u2014 15+ IN ONE RUN'); SND.win(); }
-    else if (score > 8) { toast('NICE RUN \u2014 +' + cash + ' XP'); SND.win(); }
-    if (score > 8) SND.win();
+    say(score > 8 ? 'nice one' : 'again');
+    if (score >= 15) { achieve('lead_master', 'LEAD MASTER'); SND.win(); }
+    else if (score > 8) { toast('well played. keep building.'); SND.win(); }
   }
 
   function frame() {

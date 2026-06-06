@@ -275,8 +275,8 @@ export function initHero() {
     if (!gameState) return;
     var sc = gameState.score, cash = sc * 30;
     touchL = false; touchR = false;
-    if (sc > 0) { GAME.addCash(cash); toast('MISSION COMPLETE \u2014 ' + sc + ' coins = $' + cash);
-      if (sc >= 10) { achieve('agent_deployer', 'AGENT DEPLOYER \u2014 10+ COINS'); SND.win(); } else SND.good(); }
+    if (sc > 0) { GAME.addCash(cash); toast('well played. +' + cash + ' XP earned');
+      if (sc >= 10) { achieve('agent_deployer', 'AGENT DEPLOYER'); SND.win(); } else SND.good(); }
     car.x = gameState.carX; car.vx = 0; playing = false; gameState = null;
     var p = document.querySelector('.hero-poke');
     if (p) p.textContent = isMobile() ? 'tap the rig to deploy' : 'click the rig to deploy';

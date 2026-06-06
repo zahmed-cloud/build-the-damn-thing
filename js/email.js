@@ -20,9 +20,9 @@ export function initEmail() {
       return;
     }
     msg.style.color = '#34a96a';
-    msg.textContent = 'youre in. see you every week.';
+    msg.textContent = 'youre in. see you on the journey.';
     inp.value = '';
-    toast('PLAYER JOINED \u2014 SEE YOU WEEKLY');
+    toast('progress saved. see you weekly.');
     SND.win();
   };
 }
