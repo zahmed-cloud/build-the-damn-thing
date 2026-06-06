@@ -69,75 +69,87 @@ export function initHero() {
   }
 
   /**
-   * Premium pixel car — detailed retro sports car sprite.
-   * Drawn at (cx, cy) where cy is the TOP of the car body.
-   * s = pixel unit scale.
+   * Premium pixel car — retro sports car sprite.
+   * When dev mode is active, draws a luxury gold/black skin instead.
    */
   function drawCar(c, cx, cy, s) {
-    /* === undercarriage shadow === */
+    var luxury = !!(window._btdtDev);
+
+    var bodyDark = luxury ? '#1a1a1a' : '#c44e2e';
+    var bodyMain = luxury ? '#2a2a2a' : '#e0603a';
+    var stripe   = luxury ? 'rgba(255,214,74,0.35)' : 'rgba(242,237,225,0.25)';
+    var sideLine = luxury ? '#ffd64a' : '#bb4a2a';
+    var rimCol   = luxury ? '#ffd64a' : '#bbb';
+
+    /* undercarriage */
     c.fillStyle = 'rgba(0,0,0,0.08)';
     c.fillRect(cx + s * 0.5, cy + s * 3.2, s * 9, s * 0.6);
 
-    /* === body lower (dark coral) === */
-    c.fillStyle = '#c44e2e';
+    /* body lower */
+    c.fillStyle = bodyDark;
     c.fillRect(cx, cy + s * 1.2, s * 10, s * 2);
 
-    /* === body upper / cabin roof (coral) === */
-    c.fillStyle = '#e0603a';
+    /* body upper / cabin */
+    c.fillStyle = bodyMain;
     c.fillRect(cx + s * 0.5, cy + s * 0.4, s * 9, s * 1);
     c.fillRect(cx + s * 2, cy - s * 0.6, s * 5.5, s * 1.2);
 
-    /* === windshield + rear window (sky blue) === */
-    c.fillStyle = '#7cc6ee';
+    /* windows */
+    c.fillStyle = luxury ? '#4a90b8' : '#7cc6ee';
     c.fillRect(cx + s * 2.5, cy - s * 0.3, s * 1.8, s * 0.9);
     c.fillRect(cx + s * 5.5, cy - s * 0.3, s * 1.6, s * 0.9);
 
-    /* === windshield glare === */
+    /* windshield glare */
     c.fillStyle = 'rgba(255,255,255,0.35)';
     c.fillRect(cx + s * 2.6, cy - s * 0.2, s * 0.5, s * 0.5);
 
-    /* === headlights (yellow, right side) === */
+    /* headlights */
     c.fillStyle = '#ffd64a';
     c.fillRect(cx + s * 9.5, cy + s * 1.4, s * 0.7, s * 0.7);
-    /* headlight glow */
-    c.fillStyle = 'rgba(255,214,74,0.12)';
+    c.fillStyle = luxury ? 'rgba(255,214,74,0.2)' : 'rgba(255,214,74,0.12)';
     c.beginPath(); c.arc(cx + s * 10.2, cy + s * 1.8, s * 2, 0, 7); c.fill();
 
-    /* === tail lights (red, left side) === */
+    /* tail lights */
     c.fillStyle = '#ff3333';
     c.fillRect(cx - s * 0.2, cy + s * 1.4, s * 0.5, s * 0.7);
 
-    /* === racing stripe (cream) === */
-    c.fillStyle = 'rgba(242,237,225,0.25)';
+    /* racing stripe */
+    c.fillStyle = stripe;
     c.fillRect(cx + s * 1, cy + s * 1.9, s * 8, s * 0.3);
 
-    /* === side detail line === */
-    c.fillStyle = '#bb4a2a';
+    /* side detail */
+    c.fillStyle = sideLine;
     c.fillRect(cx + s * 0.3, cy + s * 2.6, s * 9.4, s * 0.25);
 
-    /* === wheel wells === */
+    /* wheel wells */
     c.fillStyle = '#1a1714';
     c.fillRect(cx + s * 1, cy + s * 2.8, s * 2.2, s * 0.8);
     c.fillRect(cx + s * 6.8, cy + s * 2.8, s * 2.2, s * 0.8);
 
-    /* === tires (dark) === */
+    /* tires */
     c.fillStyle = '#1a1714';
     c.beginPath(); c.arc(cx + s * 2.1, cy + s * 3.5, s * 1, 0, 7); c.fill();
     c.beginPath(); c.arc(cx + s * 7.9, cy + s * 3.5, s * 1, 0, 7); c.fill();
 
-    /* === rims (silver) === */
-    c.fillStyle = '#bbb';
+    /* rims */
+    c.fillStyle = rimCol;
     c.beginPath(); c.arc(cx + s * 2.1, cy + s * 3.5, s * 0.45, 0, 7); c.fill();
     c.beginPath(); c.arc(cx + s * 7.9, cy + s * 3.5, s * 0.45, 0, 7); c.fill();
 
-    /* === rim detail (dark center) === */
-    c.fillStyle = '#666';
+    /* rim center */
+    c.fillStyle = luxury ? '#b8960a' : '#666';
     c.beginPath(); c.arc(cx + s * 2.1, cy + s * 3.5, s * 0.18, 0, 7); c.fill();
     c.beginPath(); c.arc(cx + s * 7.9, cy + s * 3.5, s * 0.18, 0, 7); c.fill();
 
-    /* === roof highlight === */
-    c.fillStyle = 'rgba(255,255,255,0.12)';
+    /* roof highlight */
+    c.fillStyle = luxury ? 'rgba(255,214,74,0.1)' : 'rgba(255,255,255,0.12)';
     c.fillRect(cx + s * 2.5, cy - s * 0.5, s * 4.5, s * 0.25);
+
+    /* dev mode underglow */
+    if (luxury) {
+      c.fillStyle = 'rgba(255,214,74,0.06)';
+      c.beginPath(); c.ellipse(cx + s * 5, cy + s * 4, s * 5.5, s * 1, 0, 0, 7); c.fill();
+    }
   }
 
   /* ── click ── */

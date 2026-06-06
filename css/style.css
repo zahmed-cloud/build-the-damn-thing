@@ -1397,6 +1397,114 @@ footer {
 }
 
 
+/* --- Builder Code (hidden hint) --- */
+
+.builder-code {
+  font-family: var(--pix);
+  font-size: 6px;
+  color: rgba(242, 237, 225, .08);
+  letter-spacing: 2px;
+  user-select: none;
+  transition: color .3s;
+}
+
+.builder-code:hover {
+  color: rgba(242, 237, 225, .18);
+}
+
+/* --- Dev Mode Flash --- */
+
+.dev-flash {
+  position: fixed;
+  inset: 0;
+  z-index: 900;
+  background: rgba(255, 255, 255, .85);
+  pointer-events: none;
+  animation: devflash .4s ease-out forwards;
+}
+
+@keyframes devflash {
+  0%   { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* --- Dev Mode Achievement Panel --- */
+
+.dev-achievement {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.8);
+  z-index: 800;
+  background: var(--bg3);
+  border: 2px solid var(--green);
+  box-shadow: 0 0 40px rgba(52, 169, 106, .2), 8px 8px 0 rgba(0, 0, 0, .4);
+  padding: 36px 44px;
+  text-align: center;
+  opacity: 0;
+  animation: devpanel .35s ease-out .3s forwards;
+  cursor: pointer;
+  max-width: 380px;
+}
+
+@keyframes devpanel {
+  0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+  100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+
+.dev-achievement .da-label {
+  font-family: var(--pix);
+  font-size: 7px;
+  color: var(--green);
+  letter-spacing: 2px;
+  margin-bottom: 14px;
+  display: block;
+}
+
+.dev-achievement .da-title {
+  font-family: var(--head);
+  font-size: 24px;
+  color: var(--cream2);
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.dev-achievement .da-sub {
+  font-family: var(--pix);
+  font-size: 7px;
+  color: var(--muted);
+  margin-bottom: 18px;
+  line-height: 1.8;
+}
+
+.dev-achievement .da-xp {
+  font-family: var(--pix);
+  font-size: 11px;
+  color: var(--yellow);
+  text-shadow: 0 0 12px rgba(255, 214, 74, .3);
+}
+
+/* --- Dev Mode active — luxury car skin glow --- */
+
+.dev-mode .hero-canvas {
+  filter: saturate(1.08) contrast(1.03);
+}
+
+.dev-mode .hud-bar {
+  border-bottom-color: var(--green);
+}
+
+.dev-mode .press-start {
+  border-color: var(--green);
+  color: #0e2c1c;
+  background: var(--green);
+  box-shadow: 6px 6px 0 #0e2c1c, 0 0 20px rgba(52, 169, 106, .15);
+}
+
+.dev-mode .builder-code {
+  color: rgba(52, 169, 106, .25);
+}
+
 /* --- Toast Notifications --- */
 
 #toast {
