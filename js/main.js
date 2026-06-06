@@ -65,10 +65,20 @@ initMarquee();
 /* --- Safe canvas sizing after layout settles --- */
 (function initResize() {
   function fire() {
-    try { window.dispatchEvent(new Event('resize')); } catch (e) { /* IE */ }
+    try { window.dispatchEvent(new Event('resize')); } catch (e) { /* noop */ }
   }
+  /*
+   * Only fire resize at meaningful layout milestones:
+   *   - rAF: first opportunity after DOM + modules are ready
+   *   - load: all resources (images, iframes) done
+   *   - fonts.ready: font metrics finalised, element sizes may change
+   *
+   * Previous code also fired at 150ms/500ms/1200ms via setTimeout,
+   * which caused 4-5 redundant build() calls that kept clearing the
+   * hero canvas buffer and resetting its context transform — the root
+   * cause of the disappearing hero world.
+   */
   requestAnimationFrame(fire);
-  [150, 500, 1200].forEach(ms => setTimeout(fire, ms));
   window.addEventListener('load', fire);
   if (document.fonts && document.fonts.ready) {
     document.fonts.ready.then(fire);

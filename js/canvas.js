@@ -12,6 +12,10 @@ export const canvasVis = {};
  * Resize a <canvas> to match its CSS-rendered size at device pixel ratio.
  * Returns { ctx, w, h, ok }.  ok === false means the canvas has no layout
  * size yet — callers should retry later instead of drawing to a 0×0 surface.
+ *
+ * IMPORTANT: Only resets the canvas buffer when dimensions actually change.
+ * Setting cv.width/cv.height destroys all content AND resets the 2D context
+ * state (including transforms), so we must avoid doing it unnecessarily.
  */
 export function fitCanvas(cv) {
   const dpr  = Math.min(window.devicePixelRatio || 1, 2);
@@ -23,10 +27,17 @@ export function fitCanvas(cv) {
     return { ctx: null, w: 0, h: 0, ok: false };
   }
 
-  cv.width  = Math.round(w * dpr);
-  cv.height = Math.round(h * dpr);
+  const needW = Math.round(w * dpr);
+  const needH = Math.round(h * dpr);
+
+  /* Only reset the buffer when size actually changed */
+  if (cv.width !== needW || cv.height !== needH) {
+    cv.width  = needW;
+    cv.height = needH;
+  }
 
   const ctx = cv.getContext('2d');
+  /* Always re-apply transform — it's lost on any buffer reset */
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   ctx.imageSmoothingEnabled = false;
 

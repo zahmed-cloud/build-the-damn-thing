@@ -4,7 +4,7 @@
  */
 
 import { drawSprite, FR, FB } from './sprite.js';
-import { fitCanvas, canvasVis }  from './canvas.js';
+import { fitCanvas }             from './canvas.js';
 import { REFIT }                 from './state.js';
 import { SND }                   from './sound.js';
 
@@ -67,6 +67,15 @@ export function initHero() {
   function build() {
     const m = fitCanvas(cv);
     if (!m.ok) { setTimeout(build, 120); return; }
+
+    /*
+     * Skip full rebuild if dimensions haven't changed.
+     * fitCanvas already re-applies the DPR transform (cheap),
+     * so the context is always correct — we just don't need to
+     * regenerate the world data or touch W/H/u/gt.
+     */
+    if (m.w === W && m.h === H && ch) return;
+
     W = m.w; H = m.h;
     u  = Math.max(3, Math.min(6, Math.round(W / 240)));
     gt = H * 0.81;
@@ -106,8 +115,12 @@ export function initHero() {
     /* birds reset */
     birds = [];
 
-    /* character */
-    if (!ch) ch = { x: W * 0.5, dir: 1, frame: 0, ft: 0, vy: 0, y: 0, grounded: true, sayT: 0, sayS: '' };
+    /* character — clamp to new bounds on resize */
+    if (!ch) {
+      ch = { x: W * 0.5, dir: 1, frame: 0, ft: 0, vy: 0, y: 0, grounded: true, sayT: 0, sayS: '' };
+    } else {
+      ch.x = Math.max(u * 8, Math.min(W - u * 8, ch.x));
+    }
   }
 
   /* --- draw helpers --- */
@@ -136,9 +149,20 @@ export function initHero() {
 
   /* --- animation loop --- */
   function frame() {
-    if (!canvasVis.heroCanvas || W < 1) { requestAnimationFrame(frame); return; }
+    if (W < 1) { requestAnimationFrame(frame); return; }
 
     const x = cv.getContext('2d');
+    if (!x) { requestAnimationFrame(frame); return; }
+
+    /*
+     * Re-apply the DPR transform every frame.
+     * This is the belt-and-suspenders fix: even if something resets
+     * the canvas context state between frames, coordinates always map
+     * correctly from CSS pixels to buffer pixels.
+     */
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    x.setTransform(dpr, 0, 0, dpr, 0, 0);
+
     const f = Date.now() / 1000;
 
     /* sky */
