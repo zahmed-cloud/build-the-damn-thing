@@ -297,12 +297,13 @@ nav.hud-bar {
 .hero-title {
   font-family: var(--head);
   font-weight: 700;
-  font-size: clamp(42px, 8.5vw, 108px);
-  line-height: .9;
+  font-size: clamp(28px, 5.8vw, 82px);
+  line-height: 1;
   color: var(--cream2);
-  text-shadow: 4px 4px 0 var(--ink), 7px 7px 0 rgba(224, 96, 58, .55);
-  letter-spacing: 1px;
+  text-shadow: 3px 3px 0 var(--ink), 6px 6px 0 rgba(224, 96, 58, .5);
+  letter-spacing: 2px;
   margin-bottom: 22px;
+  white-space: nowrap;
 }
 
 .hero-tag {
