@@ -49,7 +49,7 @@ export function fitCanvas(cv) {
  * so animation loops can skip drawing when off-screen.
  */
 export function setupCanvasObserver() {
-  const IDS = ['heroCanvas', 'stageCanvas', 'catchCanvas', 'solveCanvas', 'weekCanvas'];
+  const IDS = ['heroCanvas', 'stageCanvas', 'catchCanvas', 'solveCanvas'];
 
   if (typeof IntersectionObserver === 'undefined') {
     IDS.forEach(id => { canvasVis[id] = true; });

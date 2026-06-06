@@ -169,7 +169,7 @@ nav.hud-bar {
   justify-content: space-between;
   padding: 0 16px;
   background: #16171a;
-  border-bottom: 3px solid var(--coral);
+  border-bottom: 2px solid rgba(224, 96, 58, .4);
 }
 
 .hud-grp {
@@ -404,15 +404,16 @@ nav.hud-bar {
 
 .split-card {
   background: var(--bg2);
-  border: 2px solid var(--coral);
+  border: 2px solid rgba(242, 237, 225, .1);
   box-shadow: 6px 6px 0 rgba(0, 0, 0, .4);
   padding: 36px 32px;
-  transition: transform .12s, box-shadow .12s;
+  transition: transform .12s, box-shadow .12s, border-color .2s;
 }
 
 .split-card:hover {
   transform: translate(-3px, -3px);
-  box-shadow: 9px 9px 0 rgba(0, 0, 0, .4), 0 0 18px rgba(224, 96, 58, .08);
+  border-color: rgba(242, 237, 225, .2);
+  box-shadow: 9px 9px 0 rgba(0, 0, 0, .4), 0 0 16px rgba(242, 237, 225, .04);
 }
 
 .split-card .tag {
@@ -856,8 +857,8 @@ nav.hud-bar {
   max-width: 920px;
   margin: 0 auto;
   background: var(--bg2);
-  border: 3px solid var(--coral);
-  box-shadow: 9px 9px 0 rgba(0, 0, 0, .4);
+  border: 2px solid rgba(242, 237, 225, .12);
+  box-shadow: 8px 8px 0 rgba(0, 0, 0, .35);
   padding: 46px 44px;
 }
 
@@ -1082,78 +1083,131 @@ nav.hud-bar {
 .weeks-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 7px;
-  border: 2px solid rgba(224, 96, 58, .35);
-  background: var(--ink);
+  gap: 6px;
+  border: 1px solid rgba(242, 237, 225, .1);
+  background: rgba(29, 20, 16, .6);
   padding: 12px;
   width: 100%;
   margin: 0 auto;
-  border-radius: 2px;
 }
 
 .wk {
-  aspect-ratio: 2;
+  aspect-ratio: 2.1;
   background: var(--bg3);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  border: 1px solid rgba(242, 237, 225, .08);
+  border: 1px solid rgba(242, 237, 225, .07);
   cursor: pointer;
   transition: transform .12s, border-color .18s, box-shadow .18s, background .18s;
 }
 
 .wk:hover {
-  transform: scale(1.05);
-  border-color: rgba(224, 96, 58, .5);
-  box-shadow: 0 0 12px rgba(224, 96, 58, .15);
-  background: rgba(224, 96, 58, .04);
+  transform: scale(1.06);
+  border-color: rgba(242, 237, 225, .22);
+  box-shadow: 0 0 12px rgba(242, 237, 225, .06);
+  background: rgba(242, 237, 225, .03);
   z-index: 2;
+}
+
+.wk.active {
+  border-color: var(--green);
+  box-shadow: 0 0 10px rgba(52, 169, 106, .2);
+  background: rgba(52, 169, 106, .06);
 }
 
 .wk-n {
   font-family: var(--pix);
   font-size: 5px;
-  color: var(--muted);
+  color: rgba(242, 237, 225, .4);
   letter-spacing: 1px;
 }
 
 .wk-s {
   font-family: var(--pix);
-  font-size: 13px;
-  color: var(--cream);
+  font-size: 12px;
+  color: rgba(242, 237, 225, .75);
   margin-top: 2px;
 }
 
 .wk.planned {
-  border-color: rgba(224, 96, 58, .3);
+  border-color: rgba(242, 237, 225, .15);
 }
-
-.wk.planned:hover {
-  border-color: var(--coral);
-}
+.wk.planned .wk-s { color: var(--cream); }
 
 .wk.cur {
   background: var(--green);
-  border-color: rgba(52, 169, 106, .6);
+  border-color: rgba(52, 169, 106, .5);
   animation: weekpulse 2.5s ease-in-out infinite;
 }
-
 .wk.cur:hover {
   background: #3dbd78;
-  box-shadow: 0 0 14px rgba(52, 169, 106, .35);
+  box-shadow: 0 0 14px rgba(52, 169, 106, .3);
 }
-
 .wk.cur .wk-n { color: rgba(14, 44, 28, .55); }
 .wk.cur .wk-s { color: #0e2c1c; }
 
-#weekCanvas {
-  width: 100%;
-  height: 118px;
-  display: block;
-  margin: 18px auto 0;
-  image-rendering: pixelated;
-  cursor: pointer;
+/* --- Week Detail Panel (mission briefing) --- */
+.week-detail {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height .35s ease, padding .35s ease, margin .35s ease;
+  background: var(--bg3);
+  border: 1px solid rgba(242, 237, 225, .08);
+  margin-top: 0;
+  padding: 0 20px;
+}
+.week-detail.open {
+  max-height: 200px;
+  padding: 20px;
+  margin-top: 14px;
+  border-color: rgba(242, 237, 225, .12);
+}
+.wd-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.wd-week {
+  font-family: var(--pix);
+  font-size: 10px;
+  color: var(--cream);
+  letter-spacing: 1px;
+}
+.wd-status {
+  font-family: var(--pix);
+  font-size: 7px;
+  padding: 4px 8px;
+  letter-spacing: 1px;
+}
+.status-next    { background: var(--green); color: #0e2c1c; }
+.status-planned { background: rgba(242, 237, 225, .1); color: var(--cream); border: 1px solid rgba(242, 237, 225, .15); }
+.status-locked  { background: rgba(242, 237, 225, .04); color: var(--muted); border: 1px solid rgba(242, 237, 225, .08); }
+.wd-name {
+  font-family: var(--head);
+  font-size: 20px;
+  color: var(--cream2);
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+.wd-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 6px;
+  font-size: 13px;
+}
+.wd-label {
+  font-family: var(--pix);
+  font-size: 7px;
+  color: var(--muted);
+  min-width: 60px;
+  padding-top: 3px;
+  letter-spacing: 1px;
+}
+.wd-value {
+  color: rgba(242, 237, 225, .8);
 }
 
 .weeks-legend {
@@ -1180,8 +1234,8 @@ nav.hud-bar {
 
 .email-box {
   background: var(--bg2);
-  border: 3px solid var(--ink);
-  box-shadow: 9px 9px 0 var(--coral);
+  border: 2px solid rgba(242, 237, 225, .1);
+  box-shadow: 8px 8px 0 rgba(0, 0, 0, .35);
   padding: 46px 40px;
   max-width: 760px;
   margin: 0 auto;
@@ -1228,7 +1282,7 @@ nav.hud-bar {
 
 footer {
   background: #141518;
-  border-top: 4px solid var(--coral);
+  border-top: 1px solid rgba(242, 237, 225, .08);
   padding: 70px 0 30px;
 }
 
@@ -1275,28 +1329,27 @@ footer {
 
 .marquee {
   overflow: hidden;
-  border-top: 3px solid rgba(224, 96, 58, .15);
-  border-bottom: 3px solid rgba(224, 96, 58, .15);
-  padding: 36px 0;
+  border-top: 1px solid rgba(242, 237, 225, .06);
+  border-bottom: 1px solid rgba(242, 237, 225, .06);
+  padding: 40px 0;
   margin-top: 50px;
   white-space: nowrap;
-  background: rgba(224, 96, 58, .02);
 }
 
 .marquee-track {
   display: inline-flex;
-  animation: marquee-scroll 30s linear infinite;
+  animation: marquee-scroll 45s linear infinite;
   will-change: transform;
 }
 
 .marquee-item {
   font-family: var(--pix);
   font-weight: 400;
-  font-size: clamp(42px, 6vw, 76px);
-  color: rgba(224, 96, 58, .13);
-  padding: 0 48px;
-  text-shadow: 0 0 50px rgba(224, 96, 58, .05);
-  letter-spacing: 4px;
+  font-size: clamp(44px, 6.5vw, 80px);
+  color: rgba(242, 237, 225, .06);
+  padding: 0 56px;
+  text-shadow: 0 0 60px rgba(242, 237, 225, .02);
+  letter-spacing: 5px;
   flex-shrink: 0;
 }
 
@@ -1495,7 +1548,7 @@ footer {
 
 @media (max-width: 560px) {
   .wk {
-    aspect-ratio: 1.6;
+    aspect-ratio: 1.8;
   }
 
   .weeks-grid {

@@ -1,21 +1,14 @@
 /**
- * Hero section — pixel sky, clouds, birds, road, and a drivable pixel car.
+ * Hero section — pixel sky, clouds, birds, road, and a premium pixel car.
  *
- * The car idles on the road with a subtle bounce. Clicking it (or
- * pressing the PRESS START CTA) launches a coin-collecting mini-game
- * right inside the hero canvas. Pressing ESC or clicking exits the game.
- *
- * Architecture:
- *   - Dimensions via ResizeObserver (no per-frame polling).
- *   - rAF at TOP of frame — loop never dies.
- *   - try-catch around all drawing.
- *   - Context state fully reset every frame.
+ * Click the car or PRESS START to launch a 30-second coin-collecting
+ * mini-game. ESC exits. Coins = in-game currency.
  */
 
 import { SND }          from './sound.js';
 import { GAME, toast }  from './state.js';
 
-/* --- cloud pixel templates --- */
+/* --- cloud templates --- */
 var CLOUD_L = ['...XXXX.....','..XXXXXXXX...','.XXXXXXXXXXX.','XXXXXXXXXXXX.','.XXXXXXXXXX..'];
 var CLOUD_S = ['..XXX..','..XXXX.','.XXXXXX','XXXXXXX','.XXXXX.'];
 
@@ -23,43 +16,32 @@ export function initHero() {
   var cv = document.getElementById('heroCanvas');
   if (!cv) return;
 
-  /* ── state ── */
   var W = 0, H = 0, u = 4, roadY = 0;
   var clouds = [], spark = [], birds = [];
-  var car = null;             /* { x, bob-phase } */
-  var playing = false;        /* mini-game active? */
-  var keys = {};              /* key state for game */
-  var gameState = null;       /* mini-game runtime */
+  var car = null;
+  var playing = false, keys = {}, gameState = null;
 
-  /* ── sizing (event-driven) ── */
+  /* ── sizing ── */
   function applySize(cssW, cssH) {
     if (cssW < 1 || cssH < 1) return;
-    cssW = Math.round(cssW);
-    cssH = Math.round(cssH);
+    cssW = Math.round(cssW); cssH = Math.round(cssH);
     if (cssW === W && cssH === H && car) return;
-
     W = cssW; H = cssH;
     u = Math.max(3, Math.min(6, Math.round(W / 240)));
     roadY = H * 0.82;
-
     var dpr = Math.min(window.devicePixelRatio || 1, 2);
     var bw = Math.round(cssW * dpr), bh = Math.round(cssH * dpr);
     if (cv.width !== bw || cv.height !== bh) { cv.width = bw; cv.height = bh; }
-
     buildWorld();
   }
-
   function readSize() { var r = cv.getBoundingClientRect(); applySize(r.width, r.height); }
   readSize();
-
   if (typeof ResizeObserver !== 'undefined') {
     new ResizeObserver(function(e) { var c = e[0].contentRect; applySize(c.width, c.height); }).observe(cv);
-  } else {
-    window.addEventListener('resize', readSize);
-  }
+  } else { window.addEventListener('resize', readSize); }
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(readSize);
 
-  /* ── world generation ── */
+  /* ── world ── */
   function buildWorld() {
     clouds = [];
     var nc = W < 700 ? 5 : 9;
@@ -77,123 +59,142 @@ export function initHero() {
   }
 
   /* ── draw helpers ── */
-  function drawCloud(ctx, mat, ox, oy, un) {
+  function drawCloud(c, mat, ox, oy, un) {
     for (var r = 0; r < mat.length; r++)
       for (var i = 0; i < mat[r].length; i++) {
         if (mat[r][i] !== 'X') continue;
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(Math.floor(ox + i * un), Math.floor(oy + r * un), Math.ceil(un), Math.ceil(un));
+        c.fillStyle = '#fff';
+        c.fillRect(Math.floor(ox + i * un), Math.floor(oy + r * un), Math.ceil(un), Math.ceil(un));
       }
   }
 
-  function drawPixelCar(ctx, cx, cy, sc, flip) {
-    var s = sc; /* pixel unit for the car */
-    var d = flip ? -1 : 1;
-    var ox = flip ? cx + s * 7 : cx;
+  /**
+   * Premium pixel car — detailed retro sports car sprite.
+   * Drawn at (cx, cy) where cy is the TOP of the car body.
+   * s = pixel unit scale.
+   */
+  function drawCar(c, cx, cy, s) {
+    /* === undercarriage shadow === */
+    c.fillStyle = 'rgba(0,0,0,0.08)';
+    c.fillRect(cx + s * 0.5, cy + s * 3.2, s * 9, s * 0.6);
 
-    /* body */
-    ctx.fillStyle = '#e0603a';
-    ctx.fillRect(ox, cy, d * s * 7, s * 3);
-    /* cabin */
-    ctx.fillRect(ox + d * s * 1, cy - s * 2, d * s * 5, s * 2);
-    /* windows */
-    ctx.fillStyle = '#7cc6ee';
-    ctx.fillRect(ox + d * s * 1.6, cy - s * 1.5, d * s * 1.4, s * 1.2);
-    ctx.fillRect(ox + d * s * 3.5, cy - s * 1.5, d * s * 1.4, s * 1.2);
-    /* headlight */
-    ctx.fillStyle = '#ffd64a';
-    ctx.fillRect(ox + d * s * (flip ? -0.2 : 6.4), cy + s * 0.5, d * s * 0.8, s * 0.8);
-    /* wheels */
-    ctx.fillStyle = '#1d1410';
-    ctx.beginPath(); ctx.arc(cx + s * 1.8, cy + s * 3.1, s * 0.95, 0, 7); ctx.fill();
-    ctx.beginPath(); ctx.arc(cx + s * 5.2, cy + s * 3.1, s * 0.95, 0, 7); ctx.fill();
-    /* hub caps */
-    ctx.fillStyle = '#888';
-    ctx.beginPath(); ctx.arc(cx + s * 1.8, cy + s * 3.1, s * 0.35, 0, 7); ctx.fill();
-    ctx.beginPath(); ctx.arc(cx + s * 5.2, cy + s * 3.1, s * 0.35, 0, 7); ctx.fill();
+    /* === body lower (dark coral) === */
+    c.fillStyle = '#c44e2e';
+    c.fillRect(cx, cy + s * 1.2, s * 10, s * 2);
+
+    /* === body upper / cabin roof (coral) === */
+    c.fillStyle = '#e0603a';
+    c.fillRect(cx + s * 0.5, cy + s * 0.4, s * 9, s * 1);
+    c.fillRect(cx + s * 2, cy - s * 0.6, s * 5.5, s * 1.2);
+
+    /* === windshield + rear window (sky blue) === */
+    c.fillStyle = '#7cc6ee';
+    c.fillRect(cx + s * 2.5, cy - s * 0.3, s * 1.8, s * 0.9);
+    c.fillRect(cx + s * 5.5, cy - s * 0.3, s * 1.6, s * 0.9);
+
+    /* === windshield glare === */
+    c.fillStyle = 'rgba(255,255,255,0.35)';
+    c.fillRect(cx + s * 2.6, cy - s * 0.2, s * 0.5, s * 0.5);
+
+    /* === headlights (yellow, right side) === */
+    c.fillStyle = '#ffd64a';
+    c.fillRect(cx + s * 9.5, cy + s * 1.4, s * 0.7, s * 0.7);
+    /* headlight glow */
+    c.fillStyle = 'rgba(255,214,74,0.12)';
+    c.beginPath(); c.arc(cx + s * 10.2, cy + s * 1.8, s * 2, 0, 7); c.fill();
+
+    /* === tail lights (red, left side) === */
+    c.fillStyle = '#ff3333';
+    c.fillRect(cx - s * 0.2, cy + s * 1.4, s * 0.5, s * 0.7);
+
+    /* === racing stripe (cream) === */
+    c.fillStyle = 'rgba(242,237,225,0.25)';
+    c.fillRect(cx + s * 1, cy + s * 1.9, s * 8, s * 0.3);
+
+    /* === side detail line === */
+    c.fillStyle = '#bb4a2a';
+    c.fillRect(cx + s * 0.3, cy + s * 2.6, s * 9.4, s * 0.25);
+
+    /* === wheel wells === */
+    c.fillStyle = '#1a1714';
+    c.fillRect(cx + s * 1, cy + s * 2.8, s * 2.2, s * 0.8);
+    c.fillRect(cx + s * 6.8, cy + s * 2.8, s * 2.2, s * 0.8);
+
+    /* === tires (dark) === */
+    c.fillStyle = '#1a1714';
+    c.beginPath(); c.arc(cx + s * 2.1, cy + s * 3.5, s * 1, 0, 7); c.fill();
+    c.beginPath(); c.arc(cx + s * 7.9, cy + s * 3.5, s * 1, 0, 7); c.fill();
+
+    /* === rims (silver) === */
+    c.fillStyle = '#bbb';
+    c.beginPath(); c.arc(cx + s * 2.1, cy + s * 3.5, s * 0.45, 0, 7); c.fill();
+    c.beginPath(); c.arc(cx + s * 7.9, cy + s * 3.5, s * 0.45, 0, 7); c.fill();
+
+    /* === rim detail (dark center) === */
+    c.fillStyle = '#666';
+    c.beginPath(); c.arc(cx + s * 2.1, cy + s * 3.5, s * 0.18, 0, 7); c.fill();
+    c.beginPath(); c.arc(cx + s * 7.9, cy + s * 3.5, s * 0.18, 0, 7); c.fill();
+
+    /* === roof highlight === */
+    c.fillStyle = 'rgba(255,255,255,0.12)';
+    c.fillRect(cx + s * 2.5, cy - s * 0.5, s * 4.5, s * 0.25);
   }
 
-  /* ── click / tap ── */
+  /* ── click ── */
   cv.addEventListener('click', function(e) {
     if (!car) return;
     var r = cv.getBoundingClientRect();
     var cx = e.clientX - r.left, cy = e.clientY - r.top;
-
-    if (playing) {
-      /* clicking during game — nothing special */
-      return;
-    }
-
-    /* check if click is near the car */
-    var carCx = car.x + u * 3.5;
+    if (playing) return;
+    var carCx = car.x + u * 5;
     var carCy = roadY - u * 2;
-    if (Math.abs(cx - carCx) < u * 10 && Math.abs(cy - carCy) < u * 8) {
-      startGame();
-    }
+    if (Math.abs(cx - carCx) < u * 12 && Math.abs(cy - carCy) < u * 8) startGame();
   });
 
-  /* also wire up PRESS START button */
   var pressBtn = document.querySelector('.press-start');
-  if (pressBtn) {
-    pressBtn.addEventListener('click', function(e) {
-      e.preventDefault();
-      startGame();
-    });
-  }
+  if (pressBtn) pressBtn.addEventListener('click', function(e) { e.preventDefault(); startGame(); });
 
   /* ── keyboard ── */
   document.addEventListener('keydown', function(e) {
     keys[e.keyCode] = true;
     if (playing && e.keyCode === 27) { endGame(); e.preventDefault(); }
-    if (playing && (e.keyCode >= 37 && e.keyCode <= 40)) e.preventDefault();
+    if (playing && e.keyCode >= 37 && e.keyCode <= 40) e.preventDefault();
     if (playing && e.keyCode === 38 && gameState && gameState.grounded) {
-      gameState.vy = -u * 1.7;
-      gameState.grounded = false;
-      SND.blip();
+      gameState.vy = -u * 1.7; gameState.grounded = false; SND.blip();
     }
   });
   document.addEventListener('keyup', function(e) { keys[e.keyCode] = false; });
 
-  /* ── mini-game lifecycle ── */
+  /* ── game lifecycle ── */
   function startGame() {
     if (playing) return;
     playing = true;
-    gameState = {
-      carX: car.x, carY: roadY - u * 4, vy: 0, grounded: true,
-      coins: [], score: 0, speed: 1.8, road: 0, spawnT: 0, time: 0
-    };
+    gameState = { carX: car.x, carY: roadY - u * 4, vy: 0, grounded: true,
+      coins: [], score: 0, speed: 1.8, road: 0, spawnT: 0, time: 0 };
     SND.blip();
     toast('DRIVE \u2014 arrows to move \u00b7 collect $');
-
-    /* update hero hint */
     var poke = document.querySelector('.hero-poke');
     if (poke) poke.textContent = 'esc to exit \u00b7 arrows to drive';
   }
 
   function endGame() {
     if (!gameState) return;
-    var sc = gameState.score;
-    var cash = sc * 30;
+    var sc = gameState.score, cash = sc * 30;
     if (sc > 0) {
       GAME.addCash(cash);
       toast('RACE OVER \u2014 ' + sc + ' coins = $' + cash);
       if (sc >= 10) { toast('ACHIEVEMENT \u2014 PIXEL RACER LEGEND'); SND.win(); }
       else SND.good();
     }
-    car.x = gameState.carX;
-    playing = false;
-    gameState = null;
+    car.x = gameState.carX; playing = false; gameState = null;
     var poke = document.querySelector('.hero-poke');
     if (poke) poke.textContent = 'click the car to play';
   }
 
-  /* ══════════════════════════════════════════════════════════
-     ANIMATION LOOP
-     ══════════════════════════════════════════════════════════ */
+  /* ══════════ ANIMATION LOOP ══════════ */
   function frame() {
     requestAnimationFrame(frame);
     if (W < 1 || !car) return;
-
     var ctx = cv.getContext('2d');
     if (!ctx) return;
 
@@ -201,19 +202,15 @@ export function initHero() {
       var dpr = Math.min(window.devicePixelRatio || 1, 2);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx.globalAlpha = 1;
-
       var f = Date.now() / 1000;
 
-      /* ── sky gradient ── */
+      /* sky */
       var g = ctx.createLinearGradient(0, 0, 0, H);
-      g.addColorStop(0,    '#4aa8e3');
-      g.addColorStop(0.5,  '#7cc6ee');
-      g.addColorStop(0.75, '#a5daf5');
-      g.addColorStop(1,    '#c8ecfb');
-      ctx.fillStyle = g;
-      ctx.fillRect(0, 0, W, H);
+      g.addColorStop(0, '#4aa8e3'); g.addColorStop(0.5, '#7cc6ee');
+      g.addColorStop(0.75, '#a5daf5'); g.addColorStop(1, '#c8ecfb');
+      ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
 
-      /* ── sun ── */
+      /* sun */
       var sx = W - u * 18, sy = u * 14, sr = u * 7;
       var pulse = 1 + Math.sin(f * 1.5) * 0.15;
       ctx.fillStyle = 'rgba(255,224,110,0.15)';
@@ -225,7 +222,7 @@ export function initHero() {
       ctx.fillStyle = '#ffe98c';
       ctx.beginPath(); ctx.arc(sx - u, sy - u, sr * 0.5, 0, 7); ctx.fill();
 
-      /* ── sparkles ── */
+      /* sparkles */
       for (var si = 0; si < spark.length; si++) {
         var sp = spark[si];
         var tw = 0.25 + 0.6 * Math.abs(Math.sin(f * 2.5 + sp.ph));
@@ -235,7 +232,7 @@ export function initHero() {
         ctx.fillRect(sp.x + u * 0.15, sp.y + u * 0.7, u * 0.35, u * 0.35);
       }
 
-      /* ── clouds ── */
+      /* clouds */
       for (var ci = 0; ci < clouds.length; ci++) {
         var cl = clouds[ci];
         cl.x -= cl.sp;
@@ -245,7 +242,7 @@ export function initHero() {
       }
       ctx.globalAlpha = 1;
 
-      /* ── birds ── */
+      /* birds */
       for (var bi = birds.length - 1; bi >= 0; bi--) {
         var b = birds[bi];
         b.x += b.vx; b.py += Math.sin(f * 3 + b.ph) * 0.15;
@@ -262,40 +259,21 @@ export function initHero() {
           vx: bL ? 0.3 + Math.random() * 0.5 : -(0.3 + Math.random() * 0.5), ph: Math.random() * 6.28 });
       }
 
-      /* ══════════════════════════════
-         ROAD — the new ground layer
-         ══════════════════════════════ */
+      /* ── road ── */
       var ry = roadY;
-
-      /* grassy verge at top of road */
-      ctx.fillStyle = '#5a9e3c';
-      ctx.fillRect(0, ry - u * 1.5, W, u * 1.5);
+      ctx.fillStyle = '#5a9e3c'; ctx.fillRect(0, ry - u * 1.5, W, u * 1.5);
       ctx.fillStyle = '#6db24a';
       for (var vi = 0; vi < W; vi += u * 2) ctx.fillRect(vi, ry - u * 1.5, u, u * 0.6);
 
-      /* asphalt */
-      ctx.fillStyle = '#3a3a38';
-      ctx.fillRect(0, ry, W, H - ry);
-
-      /* road markings — animated dashes */
+      ctx.fillStyle = '#3a3a38'; ctx.fillRect(0, ry, W, H - ry);
       var roadOff = playing && gameState ? gameState.road : (f * 30) % (u * 8);
-      ctx.fillStyle = 'rgba(255,255,255,0.25)';
+      ctx.fillStyle = 'rgba(255,255,255,0.22)';
       var laneY = ry + (H - ry) * 0.45;
-      for (var ri = -roadOff % (u * 8); ri < W; ri += u * 8) {
-        ctx.fillRect(ri, laneY, u * 4, u * 0.5);
-      }
+      for (var ri = -roadOff % (u * 8); ri < W; ri += u * 8) ctx.fillRect(ri, laneY, u * 4, u * 0.4);
+      ctx.fillStyle = '#ffd64a'; ctx.fillRect(0, ry, W, u * 0.35);
+      ctx.fillStyle = '#2e2e2c'; ctx.fillRect(0, H - u * 1.5, W, u * 1.5);
 
-      /* curb line */
-      ctx.fillStyle = '#ffd64a';
-      ctx.fillRect(0, ry, W, u * 0.4);
-
-      /* bottom edge detail */
-      ctx.fillStyle = '#2e2e2c';
-      ctx.fillRect(0, H - u * 1.5, W, u * 1.5);
-
-      /* ══════════════════════════════
-         CAR — idle or playing
-         ══════════════════════════════ */
+      /* ── car ── */
       if (playing && gameState) {
         drawGameMode(ctx, f);
       } else {
@@ -307,105 +285,94 @@ export function initHero() {
     }
   }
 
-  /* ── idle car with subtle bounce ── */
   function drawIdleCar(ctx, f) {
-    var bob = Math.sin(f * 2.5) * u * 0.3;
-    var carW = u * 7, carH = u * 4;
-    var cx = car.x, cy = roadY - carH + bob;
+    var bob = Math.sin(f * 2.5) * u * 0.25;
+    var cx = car.x, cy = roadY - u * 3.8 + bob;
 
-    /* exhaust particles */
-    var ex = cx - u * 0.5, ey = cy + carH - u * 0.5;
+    /* exhaust */
     for (var i = 0; i < 3; i++) {
       var age = (f * 2 + i * 0.7) % 2;
       if (age < 1.2) {
-        ctx.globalAlpha = 0.2 * (1 - age / 1.2);
+        ctx.globalAlpha = 0.15 * (1 - age / 1.2);
         ctx.fillStyle = '#aaa';
-        ctx.fillRect(ex - age * u * 2 - i * u * 0.5, ey - age * u * 1.5, u * 0.7, u * 0.7);
+        ctx.fillRect(cx - age * u * 2 - i * u * 0.5, cy + u * 3 - age * u, u * 0.6, u * 0.6);
       }
     }
     ctx.globalAlpha = 1;
 
     /* shadow */
-    ctx.fillStyle = 'rgba(0,0,0,0.15)';
-    ctx.beginPath(); ctx.ellipse(cx + carW / 2, roadY + u * 0.5, carW * 0.55, u * 0.8, 0, 0, 7); ctx.fill();
+    ctx.fillStyle = 'rgba(0,0,0,0.12)';
+    ctx.beginPath(); ctx.ellipse(cx + u * 5, roadY + u * 0.4, u * 6, u * 0.7, 0, 0, 7); ctx.fill();
 
-    /* the car */
-    drawPixelCar(ctx, cx, cy, u, false);
+    drawCar(ctx, cx, cy, u);
 
-    /* "click to play" hint glow */
-    var glow = 0.08 + 0.05 * Math.sin(f * 3);
+    /* subtle glow hint */
+    var glow = 0.05 + 0.03 * Math.sin(f * 3);
     ctx.fillStyle = 'rgba(255,214,74,' + glow.toFixed(3) + ')';
-    ctx.beginPath(); ctx.arc(cx + carW / 2, cy + carH / 2, carW * 0.9, 0, 7); ctx.fill();
+    ctx.beginPath(); ctx.arc(cx + u * 5, cy + u * 2, u * 7, 0, 7); ctx.fill();
   }
 
-  /* ── active game mode ── */
   function drawGameMode(ctx, f) {
     var gs = gameState;
-    gs.time += 1/60;
+    gs.time += 1 / 60;
     gs.road += gs.speed * u * 0.5;
 
-    /* move car */
-    if (keys[39]) gs.carX = Math.min(W - u * 10, gs.carX + u * 0.5);
+    if (keys[39]) gs.carX = Math.min(W - u * 12, gs.carX + u * 0.5);
     if (keys[37]) gs.carX = Math.max(u * 2, gs.carX - u * 0.5);
     if (!gs.grounded) {
-      gs.vy += u * 0.11;
-      gs.carY += gs.vy;
+      gs.vy += u * 0.11; gs.carY += gs.vy;
       if (gs.carY >= roadY - u * 4) { gs.carY = roadY - u * 4; gs.vy = 0; gs.grounded = true; }
     }
 
-    /* spawn coins */
     gs.spawnT += gs.speed * 0.018;
     if (gs.spawnT > 1) {
       gs.spawnT = 0;
       gs.coins.push({ x: W + 10, y: roadY - u * 4 - Math.random() * u * 12, alive: true });
     }
 
-    /* update & draw coins */
     for (var i = gs.coins.length - 1; i >= 0; i--) {
-      var c = gs.coins[i];
-      c.x -= gs.speed * u * 0.5;
-      if (c.x < -u * 4) { gs.coins.splice(i, 1); continue; }
-      if (c.alive && Math.abs(c.x - gs.carX) < u * 5 && Math.abs(c.y - gs.carY) < u * 5) {
-        c.alive = false;
-        gs.score++;
-        SND.coin();
+      var co = gs.coins[i];
+      co.x -= gs.speed * u * 0.5;
+      if (co.x < -u * 4) { gs.coins.splice(i, 1); continue; }
+      if (co.alive && Math.abs(co.x - gs.carX) < u * 6 && Math.abs(co.y - gs.carY) < u * 5) {
+        co.alive = false; gs.score++; SND.coin();
         gs.speed = Math.min(5, 1.8 + gs.score * 0.12);
       }
-      if (c.alive) {
+      if (co.alive) {
         ctx.fillStyle = '#ffd64a';
         ctx.shadowColor = '#ffd64a'; ctx.shadowBlur = 8;
-        ctx.fillRect(c.x, c.y, u * 2, u * 2);
+        ctx.fillRect(co.x, co.y, u * 2, u * 2);
         ctx.shadowBlur = 0;
         ctx.fillStyle = '#1d1410';
         ctx.font = (u * 1.1) + "px 'Press Start 2P',monospace";
         ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-        ctx.fillText('$', c.x + u, c.y + u);
+        ctx.fillText('$', co.x + u, co.y + u);
       }
     }
 
-    /* shadow */
-    ctx.fillStyle = 'rgba(0,0,0,0.15)';
-    ctx.beginPath(); ctx.ellipse(gs.carX + u * 3.5, roadY + u * 0.5, u * 4, u * 0.8, 0, 0, 7); ctx.fill();
+    ctx.fillStyle = 'rgba(0,0,0,0.12)';
+    ctx.beginPath(); ctx.ellipse(gs.carX + u * 5, roadY + u * 0.4, u * 6, u * 0.7, 0, 0, 7); ctx.fill();
+    drawCar(ctx, gs.carX, gs.carY, u);
 
-    /* car */
-    drawPixelCar(ctx, gs.carX, gs.carY, u, false);
-
-    /* HUD overlay */
-    ctx.fillStyle = 'rgba(0,0,0,0.45)';
-    ctx.fillRect(W - u * 22, u * 2, u * 20, u * 4);
+    /* HUD */
+    ctx.fillStyle = 'rgba(0,0,0,0.5)';
+    ctx.fillRect(W - u * 24, u * 2, u * 22, u * 4.5);
+    ctx.strokeStyle = 'rgba(255,214,74,0.3)'; ctx.lineWidth = 1;
+    ctx.strokeRect(W - u * 24, u * 2, u * 22, u * 4.5);
     ctx.fillStyle = '#ffd64a';
-    ctx.font = (u * 1.6) + "px 'Press Start 2P',monospace";
+    ctx.font = (u * 1.5) + "px 'Press Start 2P',monospace";
     ctx.textAlign = 'right'; ctx.textBaseline = 'top';
     ctx.fillText('COINS ' + gs.score, W - u * 4, u * 3);
+    /* timer */
+    var timeLeft = Math.max(0, Math.ceil(30 - gs.time));
+    ctx.fillStyle = timeLeft <= 5 ? '#e0603a' : '#f2ede1';
+    ctx.font = (u * 1) + "px 'Press Start 2P',monospace";
+    ctx.fillText(timeLeft + 's', W - u * 4, u * 5);
 
-    /* auto-end at 30 seconds */
     if (gs.time > 30) endGame();
   }
 
-  /* ── start ── */
   requestAnimationFrame(frame);
-
-  /* Update the hero hint text */
   var poke = document.querySelector('.hero-poke');
   if (poke) poke.textContent = 'click the car to play';
 }
