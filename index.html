@@ -158,47 +158,17 @@
     </div>
   </section>
 
-  <!-- ===== HOW AGENTS WORK ===== -->
+  <!-- ===== HOW AGENTS WORK — Canvas Mission Control ===== -->
   <section class="sec" id="how-agents-work">
     <div class="wrap">
       <div class="sec-head">
         <span class="eyebrow">&#9654; MISSION CONTROL</span>
         <h2>how the agents actually work</h2>
       </div>
-      <div class="agent-flow" id="agentFlow">
-        <div class="af-node" data-info="You send a request. The system receives the mission.">
-          <span class="af-icon">&#9654;</span>
-          <span class="af-label">USER REQUEST</span>
-        </div>
-        <div class="af-line"><span class="af-packet"></span></div>
-        <div class="af-node" data-info="Breaks the task into smaller missions. Decides which agents to deploy and in what order.">
-          <span class="af-icon">&#9670;</span>
-          <span class="af-label">PLANNER</span>
-        </div>
-        <div class="af-line"><span class="af-packet"></span></div>
-        <div class="af-node" data-info="Finds information, context, and data. Searches the web, reads docs, pulls records.">
-          <span class="af-icon">??</span>
-          <span class="af-label">RESEARCH</span>
-        </div>
-        <div class="af-line"><span class="af-packet"></span></div>
-        <div class="af-node" data-info="Performs actions. Sends emails, updates CRM, books meetings, writes code.">
-          <span class="af-icon">&gt;&gt;</span>
-          <span class="af-label">EXECUTE</span>
-        </div>
-        <div class="af-line"><span class="af-packet"></span></div>
-        <div class="af-node" data-info="Checks outputs before delivery. Validates results, catches errors, confirms quality.">
-          <span class="af-icon">!!</span>
-          <span class="af-label">QA CHECK</span>
-        </div>
-        <div class="af-line"><span class="af-packet"></span></div>
-        <div class="af-node af-done" data-info="Mission complete. Result delivered back to you automatically.">
-          <span class="af-icon">&#9733;</span>
-          <span class="af-label">DELIVERED</span>
-        </div>
-      </div>
-      <div class="af-detail" id="afDetail">
-        <span class="af-detail-title"></span>
-        <span class="af-detail-desc">tap a node to see what it does</span>
+      <canvas id="missionCanvas" class="mission-canvas" aria-label="Interactive AI agent workflow diagram. Click nodes to learn what each agent does."></canvas>
+      <div class="mc-info" id="mcInfo">
+        <span class="mc-info-title" id="mcTitle"></span>
+        <span class="mc-info-desc" id="mcDesc">click a node to see what it does</span>
       </div>
     </div>
   </section>
