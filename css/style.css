@@ -1081,56 +1081,69 @@ nav.hud-bar {
 .weeks-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 9px;
-  border: 3px solid var(--coral);
+  gap: 7px;
+  border: 2px solid rgba(224, 96, 58, .35);
   background: var(--ink);
-  padding: 14px;
+  padding: 12px;
   width: 100%;
   margin: 0 auto;
+  border-radius: 2px;
 }
 
 .wk {
-  aspect-ratio: 1.7;
+  aspect-ratio: 2;
   background: var(--bg3);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  border: 1px solid var(--line);
+  border: 1px solid rgba(242, 237, 225, .08);
   cursor: pointer;
-  transition: transform .1s, border-color .15s, box-shadow .15s;
+  transition: transform .12s, border-color .18s, box-shadow .18s, background .18s;
 }
 
 .wk:hover {
-  transform: scale(1.06);
-  border-color: var(--coral);
-  box-shadow: 0 0 14px rgba(224, 96, 58, .25);
+  transform: scale(1.05);
+  border-color: rgba(224, 96, 58, .5);
+  box-shadow: 0 0 12px rgba(224, 96, 58, .15);
+  background: rgba(224, 96, 58, .04);
   z-index: 2;
 }
 
 .wk-n {
   font-family: var(--pix);
-  font-size: 6px;
+  font-size: 5px;
   color: var(--muted);
+  letter-spacing: 1px;
 }
 
 .wk-s {
   font-family: var(--pix);
-  font-size: 14px;
+  font-size: 13px;
   color: var(--cream);
   margin-top: 2px;
 }
 
 .wk.planned {
+  border-color: rgba(224, 96, 58, .3);
+}
+
+.wk.planned:hover {
   border-color: var(--coral);
 }
 
 .wk.cur {
   background: var(--green);
-  animation: weekpulse 2s ease-in-out infinite;
+  border-color: rgba(52, 169, 106, .6);
+  animation: weekpulse 2.5s ease-in-out infinite;
 }
 
-.wk.cur .wk-n { color: rgba(14, 44, 28, .65); }
+.wk.cur:hover {
+  background: #3dbd78;
+  box-shadow: 0 0 14px rgba(52, 169, 106, .35);
+}
+
+.wk.cur .wk-n { color: rgba(14, 44, 28, .55); }
 .wk.cur .wk-s { color: #0e2c1c; }
 
 #weekCanvas {
@@ -1261,26 +1274,29 @@ footer {
 
 .marquee {
   overflow: hidden;
-  border-top: 3px solid rgba(224, 96, 58, .12);
-  border-bottom: 3px solid rgba(224, 96, 58, .12);
-  padding: 30px 0;
+  border-top: 3px solid rgba(224, 96, 58, .15);
+  border-bottom: 3px solid rgba(224, 96, 58, .15);
+  padding: 36px 0;
   margin-top: 50px;
   white-space: nowrap;
+  background: rgba(224, 96, 58, .02);
 }
 
 .marquee-track {
-  display: inline-block;
-  animation: scroll 22s linear infinite;
+  display: inline-flex;
+  animation: marquee-scroll 30s linear infinite;
+  will-change: transform;
 }
 
 .marquee-item {
   font-family: var(--pix);
   font-weight: 400;
-  font-size: clamp(36px, 5.5vw, 64px);
-  color: rgba(224, 96, 58, .14);
-  margin: 0 40px;
-  text-shadow: 0 0 40px rgba(224, 96, 58, .06);
-  letter-spacing: 3px;
+  font-size: clamp(42px, 6vw, 76px);
+  color: rgba(224, 96, 58, .13);
+  padding: 0 48px;
+  text-shadow: 0 0 50px rgba(224, 96, 58, .05);
+  letter-spacing: 4px;
+  flex-shrink: 0;
 }
 
 .foot-bottom {
@@ -1382,12 +1398,12 @@ footer {
 
 @keyframes weekpulse {
   0%, 100% { box-shadow: 0 0 0 rgba(52, 169, 106, 0); }
-  50%      { box-shadow: 0 0 18px rgba(52, 169, 106, .5); }
+  50%      { box-shadow: 0 0 14px rgba(52, 169, 106, .35); }
 }
 
-@keyframes scroll {
-  from { transform: translateX(0); }
-  to   { transform: translateX(-50%); }
+@keyframes marquee-scroll {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
 }
 
 
@@ -1478,7 +1494,7 @@ footer {
 
 @media (max-width: 560px) {
   .wk {
-    aspect-ratio: 1.35;
+    aspect-ratio: 1.6;
   }
 
   .weeks-grid {
