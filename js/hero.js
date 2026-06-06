@@ -211,8 +211,11 @@ export function initHero() {
 
   /* ── interactions ── */
   cv.addEventListener('click', function(e) {
-    if (!car || playing) return;
+    if (!car) return;
     var r = cv.getBoundingClientRect(), cx = e.clientX - r.left, cy = e.clientY - r.top;
+    /* exit button: top-left corner during gameplay */
+    if (playing && cx < u * 12 && cy < u * 6) { endGame(); return; }
+    if (playing) return;
     if (Math.abs(cx - (car.x + u * 7)) < u * 16 && Math.abs(cy - (roadY - u * 2)) < u * 10) startGame();
   });
   var pressBtn = document.querySelector('.press-start');
@@ -228,14 +231,22 @@ export function initHero() {
   document.addEventListener('keyup', function(e) { keys[e.keyCode] = false; });
 
   cv.addEventListener('touchstart', function(e) {
-    if (!playing || !gameState) return; e.preventDefault();
+    if (!playing || !gameState) return;
     var r = cv.getBoundingClientRect();
+    var handled = false;
     for (var i = 0; i < e.touches.length; i++) {
       var tx = e.touches[i].clientX - r.left, ty = e.touches[i].clientY - r.top;
-      if (tx < W * 0.33) touchL = true;
-      else if (tx > W * 0.67) touchR = true;
-      else if (ty < H * 0.6 && gameState.grounded) { gameState.vy = -u * 1.5; gameState.grounded = false; SND.blip(); }
+      /* only intercept touches on the ROAD area (below roadY line) or jump zone */
+      if (ty > roadY * 0.5) {
+        if (tx < W * 0.33) { touchL = true; handled = true; }
+        else if (tx > W * 0.67) { touchR = true; handled = true; }
+        else if (ty < roadY && gameState.grounded) {
+          gameState.vy = -u * 1.5; gameState.grounded = false; SND.blip(); handled = true;
+        }
+      }
     }
+    /* only block scroll when touch is actually on a control zone */
+    if (handled) e.preventDefault();
   }, { passive: false });
   cv.addEventListener('touchend', function(e) {
     if (!playing) return; touchL = false; touchR = false;
@@ -312,10 +323,7 @@ export function initHero() {
       /* highlight */
       ctx.fillStyle = '#f8dca0';
       ctx.beginPath(); ctx.arc(mx - u * 1.2, my - u * 1.2, mr * 0.4, 0, 7); ctx.fill();
-      /* surface detail (craters) */
-      ctx.fillStyle = 'rgba(200,170,80,0.3)';
-      ctx.beginPath(); ctx.arc(mx + u * 2, my + u * 1, u * 1.2, 0, 7); ctx.fill();
-      ctx.beginPath(); ctx.arc(mx - u * 1.5, my + u * 2.5, u * 0.8, 0, 7); ctx.fill();
+      /* clean surface — no crater artifacts */
 
       /* ── clouds (subtle) ── */
       for (var ci = 0; ci < clouds.length; ci++) {
@@ -496,6 +504,15 @@ export function initHero() {
     ctx.fillStyle = tl <= 5 ? '#e0603a' : '#f2ede1';
     ctx.font = Math.min(u * 0.9, 10) + "px 'Press Start 2P',monospace";
     ctx.fillText(tl + 's', W - u * 3, u * 5);
+    /* EXIT button — top left, always visible during gameplay */
+    ctx.fillStyle = 'rgba(0,0,0,0.5)';
+    ctx.fillRect(u * 1.5, u * 2, u * 10, u * 4);
+    ctx.strokeStyle = 'rgba(242,237,225,0.2)'; ctx.lineWidth = 1;
+    ctx.strokeRect(u * 1.5, u * 2, u * 10, u * 4);
+    ctx.fillStyle = '#f2ede1';
+    ctx.font = Math.min(u * 1, 10) + "px 'Press Start 2P',monospace";
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText('EXIT', u * 6.5, u * 4);
     if (isMobile()) {
       ctx.globalAlpha = 0.025; ctx.fillStyle = '#fff';
       ctx.fillRect(0, roadY, W * 0.33, H - roadY); ctx.fillRect(W * 0.67, roadY, W * 0.33, H - roadY);

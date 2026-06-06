@@ -16,6 +16,10 @@ import { initEmail, initMarquee }                      from './email.js';
 document.documentElement.classList.add('js');
 window.SND = SND;
 
+/* --- Always start at the top on page load/refresh --- */
+if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+window.scrollTo(0, 0);
+
 /* --- Check localStorage for dev mode --- */
 var devMode = false;
 try { devMode = localStorage.getItem('btdt_dev') === '1'; } catch(e) {}
