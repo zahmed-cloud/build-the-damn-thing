@@ -18,11 +18,13 @@ import { initEmail, initMarquee }                      from './email.js';
 /* --- Progressive enhancement flag --- */
 document.documentElement.classList.add('js');
 
-/* --- Observers (must run before canvas inits) --- */
+/* --- Observers for game canvases + section scroll-in --- */
 setupCanvasObserver();
 setupSectionAnimations();
 
-/* --- Section init --- */
+/* --- Section init ---
+   Hero is fully self-contained (handles its own sizing/resizing internally).
+   Game canvases still use the REFIT/resize pattern for tab switching. */
 initHero();
 initBuildGame();
 initCatchGame();
@@ -62,22 +64,11 @@ initMarquee();
   };
 })();
 
-/* --- Safe canvas sizing after layout settles --- */
+/* --- Resize fire for game canvases (NOT hero — hero handles itself) --- */
 (function initResize() {
   function fire() {
     try { window.dispatchEvent(new Event('resize')); } catch (e) { /* noop */ }
   }
-  /*
-   * Only fire resize at meaningful layout milestones:
-   *   - rAF: first opportunity after DOM + modules are ready
-   *   - load: all resources (images, iframes) done
-   *   - fonts.ready: font metrics finalised, element sizes may change
-   *
-   * Previous code also fired at 150ms/500ms/1200ms via setTimeout,
-   * which caused 4-5 redundant build() calls that kept clearing the
-   * hero canvas buffer and resetting its context transform — the root
-   * cause of the disappearing hero world.
-   */
   requestAnimationFrame(fire);
   window.addEventListener('load', fire);
   if (document.fonts && document.fonts.ready) {
