@@ -72,6 +72,21 @@ initMarquee();
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(fire);
 })();
 
+/* --- Header scroll: transparent → solid past hero --- */
+(function() {
+  var hud = document.querySelector('.hud-bar');
+  if (!hud) return;
+  var scrolled = false;
+  window.addEventListener('scroll', function() {
+    var past = window.scrollY > 100;
+    if (past !== scrolled) {
+      scrolled = past;
+      if (past) hud.classList.add('scrolled');
+      else hud.classList.remove('scrolled');
+    }
+  }, { passive: true });
+})();
+
 /* ================================================================
    SECRET BUILDER CODE
    ================================================================ */
