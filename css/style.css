@@ -230,6 +230,7 @@ nav.hud-bar.scrolled {
 
 .hero {
   height: 100vh;
+  height: 100svh; /* small viewport height — fixes iOS Safari address bar */
   min-height: 560px;
   position: relative;
   overflow: hidden;

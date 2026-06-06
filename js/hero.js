@@ -293,7 +293,7 @@ export function initHero() {
       }
 
     } catch (e) {
-      if (typeof console !== 'undefined') console.warn('Hero frame error:', e);
+      /* silent — loop continues on next frame */
     }
   }
 
