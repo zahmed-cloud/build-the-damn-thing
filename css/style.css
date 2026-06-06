@@ -253,10 +253,15 @@ nav.hud-bar {
 
 .hero-canvas {
   position: absolute;
-  inset: 0;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   z-index: 1;
   image-rendering: pixelated;
   cursor: pointer;
+  /* Explicit width/height instead of inset:0 prevents browsers
+     from using the canvas intrinsic width attribute for CSS layout */
 }
 
 .hero-ui {

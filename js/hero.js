@@ -2,9 +2,12 @@
  * Hero section — animated pixel sky, clouds, birds, flowers,
  * roaming & clickable mascot with speech bubbles.
  *
- * This module is fully self-contained. The render loop handles its own
- * canvas sizing, world generation, and error recovery. It does NOT
- * depend on external resize events, REFIT, or canvasVis.
+ * Architecture:
+ *   - Dimensions are read ONCE at startup, then ONLY via ResizeObserver.
+ *     No per-frame getBoundingClientRect (eliminates layout thrashing).
+ *   - rAF is scheduled at the TOP of frame() so the loop never dies.
+ *   - All drawing is wrapped in try-catch.
+ *   - Context state (transform, globalAlpha) is fully reset every frame.
  */
 
 import { drawSprite, FR, FB } from './sprite.js';
@@ -54,70 +57,97 @@ const LINES = [
   'absolute scenes right now'
 ];
 
-const FLOWER_COLOURS = ['#ff6b8a','#ffb347','#ff85c0','#ffd64a','#ff7eb3','#e8a0ff'];
+const FLOWER_COLOURS = ['#ff6b8a', '#ffb347', '#ff85c0', '#ffd64a', '#ff7eb3', '#e8a0ff'];
 
 export function initHero() {
-  const cv = document.getElementById('heroCanvas');
+  var cv = document.getElementById('heroCanvas');
   if (!cv) return;
 
-  /* --- state --- */
-  let W = 0, H = 0, u = 4, gt = 0;
-  let clouds = [], spark = [], flowers = [], birds = [];
-  let ch = null;
-  let autoTimer = 0;
+  /* --- mutable state --- */
+  var W = 0, H = 0, u = 4, gt = 0;
+  var clouds = [], spark = [], flowers = [], birds = [];
+  var ch = null;
+  var autoTimer = 0;
+
+  /* ================================================================
+     SIZING — event-driven, not polled
+     ================================================================ */
 
   /**
-   * Ensure the canvas buffer matches its CSS display size.
-   * Returns true if the world needs to be regenerated (first call or resize).
-   * Returns false if nothing changed (most frames).
+   * Apply new CSS dimensions.  Only rebuilds the world if the size
+   * actually changed.  Called from ResizeObserver and initial setup.
    */
-  function ensureSize() {
-    const dpr  = Math.min(window.devicePixelRatio || 1, 2);
-    const rect = cv.getBoundingClientRect();
-    const cssW = rect.width;
-    const cssH = rect.height;
+  function applySize(cssW, cssH) {
+    if (cssW < 1 || cssH < 1) return;
 
-    if (cssW < 1 || cssH < 1) return false;
+    /* Round to integers — prevents float-precision flip-flopping */
+    cssW = Math.round(cssW);
+    cssH = Math.round(cssH);
 
-    const bufW = Math.round(cssW * dpr);
-    const bufH = Math.round(cssH * dpr);
+    if (cssW === W && cssH === H && ch) return; /* nothing changed */
 
-    let resized = false;
+    W  = cssW;
+    H  = cssH;
+    u  = Math.max(3, Math.min(6, Math.round(W / 240)));
+    gt = H * 0.81;
+
+    /* Set canvas buffer to match at device pixel ratio */
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var bufW = Math.round(cssW * dpr);
+    var bufH = Math.round(cssH * dpr);
     if (cv.width !== bufW || cv.height !== bufH) {
       cv.width  = bufW;
       cv.height = bufH;
-      resized = true;
     }
 
-    /* Always re-apply the DPR transform.
-       Setting cv.width/height resets ALL context state including the
-       transform matrix. Even when we skip the reset, re-applying is
-       cheap insurance (~0.001ms) against any external state corruption. */
-    const ctx = cv.getContext('2d');
-    if (ctx) {
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      ctx.imageSmoothingEnabled = false;
-    }
-
-    /* Detect if the CSS dimensions changed (independent of buffer) */
-    const dimChanged = (cssW !== W || cssH !== H);
-    if (dimChanged || !ch) {
-      W  = cssW;
-      H  = cssH;
-      u  = Math.max(3, Math.min(6, Math.round(W / 240)));
-      gt = H * 0.81;
-      return true;   /* world needs rebuild */
-    }
-
-    return false;
+    buildWorld();
   }
 
-  /** Regenerate all world objects for current W/H/u/gt. */
+  /**
+   * Read current CSS dimensions from the element.
+   * Only called at startup and as a fallback — normal resizes go
+   * through ResizeObserver which provides dimensions directly.
+   */
+  function readSize() {
+    var rect = cv.getBoundingClientRect();
+    applySize(rect.width, rect.height);
+  }
+
+  /* Initial sizing — runs once, synchronously */
+  readSize();
+
+  /* ResizeObserver for all subsequent dimension changes.
+     This fires on window resize, font-load layout shifts, scrollbar
+     appearance, etc. — WITHOUT per-frame polling. */
+  if (typeof ResizeObserver !== 'undefined') {
+    var ro = new ResizeObserver(function(entries) {
+      for (var i = 0; i < entries.length; i++) {
+        var cr = entries[i].contentRect;
+        applySize(cr.width, cr.height);
+      }
+    });
+    ro.observe(cv);
+  } else {
+    /* Fallback for very old browsers */
+    window.addEventListener('resize', function() {
+      readSize();
+    });
+  }
+
+  /* Also re-check after fonts load (can trigger layout shift) */
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(function() { readSize(); });
+  }
+
+  /* ================================================================
+     WORLD GENERATION
+     ================================================================ */
+
   function buildWorld() {
     clouds = [];
-    const nc = W < 700 ? 5 : 9;
-    for (let i = 0; i < nc; i++) {
-      const ly = Math.random();
+    var nc = W < 700 ? 5 : 9;
+    for (var i = 0; i < nc; i++) {
+      var ly = Math.random();
       clouds.push({
         x: Math.random() * W,
         y: 18 + Math.random() * (H * 0.40),
@@ -129,12 +159,12 @@ export function initHero() {
     }
 
     spark = [];
-    for (let i = 0; i < 18; i++) {
+    for (var i = 0; i < 18; i++) {
       spark.push({ x: Math.random() * W, y: Math.random() * H * 0.55, ph: Math.random() * 6.28 });
     }
 
     flowers = [];
-    for (let i = 0; i < Math.floor(W / 60); i++) {
+    for (var i = 0; i < Math.floor(W / 60); i++) {
       flowers.push({
         x: Math.random() * W,
         c: FLOWER_COLOURS[(Math.random() * FLOWER_COLOURS.length) | 0],
@@ -152,17 +182,23 @@ export function initHero() {
     }
   }
 
-  /* --- draw helpers --- */
+  /* ================================================================
+     DRAW HELPERS
+     ================================================================ */
+
   function drawCloud(ctx, mat, ox, oy, un) {
-    for (let r = 0; r < mat.length; r++)
-      for (let i = 0; i < mat[r].length; i++) {
+    for (var r = 0; r < mat.length; r++)
+      for (var i = 0; i < mat[r].length; i++) {
         if (mat[r][i] !== 'X') continue;
         ctx.fillStyle = '#ffffff';
         ctx.fillRect(Math.floor(ox + i * un), Math.floor(oy + r * un), Math.ceil(un), Math.ceil(un));
       }
   }
 
-  /* --- click interaction --- */
+  /* ================================================================
+     CLICK INTERACTION
+     ================================================================ */
+
   cv.addEventListener('click', function(e) {
     if (!ch) return;
     var r  = cv.getBoundingClientRect();
@@ -180,31 +216,30 @@ export function initHero() {
   /* ================================================================
      ANIMATION LOOP
      ================================================================
-     requestAnimationFrame is called FIRST, before any drawing.
-     This guarantees the loop can never die — even if a drawing
-     operation throws, the next frame is already scheduled.
-     All drawing is wrapped in try-catch as a safety net.
+     1. rAF is FIRST — loop can never die
+     2. Context state (transform, alpha) is fully reset every frame
+     3. All drawing is in try-catch — errors never kill the loop
+     4. NO dimension polling — sizes come from ResizeObserver
      ================================================================ */
+
   function frame() {
-    /* Schedule next frame FIRST — loop can never die */
     requestAnimationFrame(frame);
 
-    /* Self-size: check canvas dimensions every frame.
-       On most frames this is a no-op (< 0.01ms).
-       On resize it rebuilds the world. */
-    var needsBuild = ensureSize();
-    if (needsBuild) buildWorld();
-
-    /* Bail if canvas isn't ready yet */
     if (W < 1 || !ch) return;
 
     var ctx = cv.getContext('2d');
     if (!ctx) return;
 
     try {
-      /* Re-apply transform (belt-and-suspenders) */
+      /* === RESET CONTEXT STATE ===
+         This is critical: transform and globalAlpha MUST be set to
+         known-good values at the start of every frame.  If a previous
+         frame threw an error mid-draw (e.g. during clouds where
+         globalAlpha was set to 0.6), these values would persist and
+         corrupt all subsequent rendering permanently. */
       var dpr = Math.min(window.devicePixelRatio || 1, 2);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.globalAlpha = 1;
 
       var f = Date.now() / 1000;
 
@@ -249,7 +284,7 @@ export function initHero() {
         ctx.globalAlpha = cl.a;
         drawCloud(ctx, cl.shape, cl.x, cl.y, cl.sc);
       }
-      ctx.globalAlpha = 1;
+      ctx.globalAlpha = 1;  /* reset after clouds */
 
       /* --- birds --- */
       for (var bi = birds.length - 1; bi >= 0; bi--) {
@@ -264,11 +299,11 @@ export function initHero() {
         if (b.x < -30 || b.x > W + 30) birds.splice(bi, 1);
       }
       if (birds.length < 3 && Math.random() < 0.003) {
-        var left = Math.random() > 0.5;
+        var bLeft = Math.random() > 0.5;
         birds.push({
-          x: left ? -20 : W + 20,
+          x: bLeft ? -20 : W + 20,
           py: 20 + Math.random() * H * 0.3,
-          vx: left ? (0.3 + Math.random() * 0.5) : -(0.3 + Math.random() * 0.5),
+          vx: bLeft ? (0.3 + Math.random() * 0.5) : -(0.3 + Math.random() * 0.5),
           ph: Math.random() * 6.28
         });
       }
@@ -280,8 +315,8 @@ export function initHero() {
       for (var gi = 0; gi < W; gi += u * 2) ctx.fillRect(gi, gt, u, u);
       ctx.fillStyle = '#7bc75a';
       for (var gi2 = 0; gi2 < W; gi2 += u * 5) {
-        var sway = Math.sin(f * 2 + gi2 * 0.1) * u * 0.3;
-        ctx.fillRect(gi2 + sway, gt - u * 0.7, u * 0.5, u * 0.7);
+        var gsway = Math.sin(f * 2 + gi2 * 0.1) * u * 0.3;
+        ctx.fillRect(gi2 + gsway, gt - u * 0.7, u * 0.5, u * 0.7);
       }
 
       /* --- flowers --- */
@@ -309,7 +344,7 @@ export function initHero() {
         ctx.fillRect(di + u * 2, gt + u * 7, u, u);
       }
 
-      /* --- character walk --- */
+      /* --- character --- */
       if (ch.grounded) {
         ch.x += ch.dir * 0.55 * u;
         if (ch.x > W - u * 8) ch.dir = -1;
@@ -318,7 +353,6 @@ export function initHero() {
         if (ch.ft > 9) { ch.ft = 0; ch.frame ^= 1; }
       }
 
-      /* --- auto-speak --- */
       autoTimer++;
       if (ch.sayT <= 0 && autoTimer > 840) {
         ch.sayS = LINES[(Math.random() * LINES.length) | 0];
@@ -327,7 +361,6 @@ export function initHero() {
         SND.say(ch.sayS);
       }
 
-      /* --- jump physics --- */
       if (!ch.grounded) {
         ch.y += ch.vy;
         ch.vy += 0.55;
@@ -338,14 +371,14 @@ export function initHero() {
       var mat = ch.frame ? FB : FR;
       var oy  = gt - 14 * u + ch.y - bob;
 
-      /* --- shadow --- */
+      /* shadow */
       ctx.fillStyle = 'rgba(0,0,0,0.16)';
       ctx.beginPath(); ctx.ellipse(ch.x, gt + u * 1.2, u * 5, u * 1.1, 0, 0, 7); ctx.fill();
 
-      /* --- sprite --- */
+      /* sprite */
       drawSprite(ctx, mat, ch.x - 5.5 * u, oy, u, ch.dir < 0);
 
-      /* --- speech bubble --- */
+      /* speech bubble */
       if (ch.sayT > 0) {
         ch.sayT--;
         ctx.font = "9px 'Press Start 2P',monospace";
@@ -361,12 +394,14 @@ export function initHero() {
       }
 
     } catch (e) {
-      /* Drawing error — loop continues on next frame.
-         Log for debugging but never let it kill the loop. */
+      /* Error in drawing — log but never kill the loop.
+         Next frame starts with a full context reset so
+         even corrupted state (wrong alpha, bad transform)
+         is cleaned up automatically. */
       if (typeof console !== 'undefined') console.warn('Hero frame error:', e);
     }
   }
 
-  /* --- start the self-contained loop --- */
+  /* --- kick off --- */
   requestAnimationFrame(frame);
 }
