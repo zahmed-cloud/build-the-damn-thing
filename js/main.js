@@ -58,7 +58,7 @@ initMarquee();
 
   btn.onclick = () => {
     const on = SND.toggle();
-    btn.innerHTML = on ? '\ud83d\udd0a' : '\ud83d\udd07';
+    btn.textContent = on ? 'SND' : 'OFF';
     btn.setAttribute('aria-label', on ? 'Sound on, click to mute' : 'Sound off, click to unmute');
     if (on) SND.blip();
   };

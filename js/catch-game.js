@@ -70,8 +70,8 @@ export function initCatchGame() {
       pop(c.x, c.y, '#ffd64a', '+' + pts + (combo >= 3 ? ' x' + combo : ''));
       hop();
       SND.coin();
-      if (combo === 5)  { say('combo!'); SND.say('combo!'); }
-      if (combo === 10) { say('on fire!'); SND.say('on fire!'); }
+      if (combo === 5)  { say('combo!'); SND.good(); }
+      if (combo === 10) { say('on fire!'); SND.win(); }
       for (let t = 0; t < 6; t++) {
         trails.push({ x: c.x, y: c.y, vx: (Math.random() - .5) * 4, vy: -Math.random() * 3 - 1, c: '#ffd64a', life: 20 });
       }
@@ -95,7 +95,7 @@ export function initCatchGame() {
     sEl.textContent = '0'; tEl.textContent = '20'; comboEl.textContent = '0'; rEl.textContent = '';
     btn.disabled = true; btn.textContent = 'GO!';
     last = Date.now();
-    say('go go go!'); SND.blip(); SND.say('go go go!');
+    say('go go go!'); SND.blip();
   }
 
   btn.onclick = () => { if (!running) start(); };
@@ -113,7 +113,7 @@ export function initCatchGame() {
     btn.disabled = false; btn.textContent = '\u25b6 PLAY AGAIN';
     say(score > 8 ? 'huge!' : 'again ay');
     if (score > 8) { toast('NICE RUN \u2014 +$' + cash); SND.win(); }
-    SND.say(score > 8 ? 'huge run!' : 'go again!');
+    if (score > 8) SND.win();
   }
 
   function frame() {

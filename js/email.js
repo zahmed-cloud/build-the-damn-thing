@@ -24,7 +24,6 @@ export function initEmail() {
     inp.value = '';
     toast('PLAYER JOINED \u2014 SEE YOU WEEKLY');
     SND.win();
-    SND.say('welcome aboard legend!');
   };
 }
 

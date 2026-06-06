@@ -113,10 +113,10 @@ export function initWeeksMap() {
       if (st.ft > 8) { st.ft = 0; st.frame ^= 1; }
       if (Math.abs(st.x - st.target) < u * 1.4) {
         st.phase = 'talk'; st.talkT = 200;
-        if (st.pendingSpeak) { SND.say(st.sayS); st.pendingSpeak = false; }
+        if (st.pendingSpeak) { st.pendingSpeak = false; }
       }
     } else if (st.phase === 'talk') {
-      if (st.pendingSpeak) { SND.say(st.sayS); st.pendingSpeak = false; st.talkT = 200; }
+      if (st.pendingSpeak) { st.pendingSpeak = false; st.talkT = 200; }
       st.talkT--;
       if (st.talkT <= 0) { st.phase = 'out'; st.target = st.x < W / 2 ? -u * 9 : W + u * 9; }
     } else if (st.phase === 'out') {

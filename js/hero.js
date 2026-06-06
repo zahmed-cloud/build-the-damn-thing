@@ -208,7 +208,6 @@ export function initHero() {
       ch.sayS = LINES[(Math.random() * LINES.length) | 0];
       ch.sayT = 80;
       autoTimer = 0;
-      SND.say(ch.sayS);
       SND.blip();
     }
   });
@@ -358,7 +357,6 @@ export function initHero() {
         ch.sayS = LINES[(Math.random() * LINES.length) | 0];
         ch.sayT = 80;
         autoTimer = 0;
-        SND.say(ch.sayS);
       }
 
       if (!ch.grounded) {

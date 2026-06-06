@@ -104,13 +104,11 @@ export function initSolveGame() {
       pose = 'happy'; poseT = 90;
       toast('CORRECT \u2014 +$80');
       SND.good();
-      SND.say('yesss, nailed it!');
     } else {
       btn.classList.add('wrong');
       bEl.textContent = 'nah mate';
       pose = 'sad'; poseT = 40;
       SND.bad();
-      SND.say('nah mate, not that one');
     }
 
     lEl.textContent = '\u2192 ' + s.l;
@@ -161,9 +159,6 @@ export function initSolveGame() {
     poseT = win ? 170 : 0;
 
     if (win) { toast('LEVEL CLEAR \u2014 NICE ONE'); SND.win(); }
-    SND.say(win
-      ? 'bloody hell, you actually get this. respect mate.'
-      : 'have another crack, you will get it.');
   }
 
   /* --- next button --- */
