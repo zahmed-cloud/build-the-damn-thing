@@ -3,7 +3,7 @@
  */
 
 import { SND }                                        from './sound.js';
-import { REFIT, GAME, toast }                          from './state.js';
+import { REFIT, GAME, toast, achieve }                  from './state.js';
 import { setupCanvasObserver, setupSectionAnimations } from './canvas.js';
 import { initHero }                                    from './hero.js';
 import { initBuildGame }                               from './build-game.js';
@@ -12,8 +12,9 @@ import { initSolveGame }                               from './solve-game.js';
 import { initWeeksMap }                                from './weeks-map.js';
 import { initEmail, initMarquee }                      from './email.js';
 
-/* --- Progressive enhancement --- */
+/* --- Progressive enhancement + expose SND globally for state.js --- */
 document.documentElement.classList.add('js');
+window.SND = SND;
 
 /* --- Check localStorage for dev mode --- */
 var devMode = false;
@@ -203,6 +204,6 @@ initMarquee();
     panel.addEventListener('click', close);
     setTimeout(close, 4500);
 
-    toast('DEV MODE UNLOCKED \u2014 Welcome Builder');
+    achieve('dev_mode', 'DEV MODE UNLOCKED \u2014 Welcome Builder');
   }
 })();

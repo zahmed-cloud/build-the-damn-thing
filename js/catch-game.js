@@ -4,7 +4,7 @@
 
 import { drawSprite, FR }        from './sprite.js';
 import { fitCanvas, canvasVis }  from './canvas.js';
-import { GAME, toast, REFIT }    from './state.js';
+import { GAME, toast, achieve, REFIT } from './state.js';
 import { SND }                   from './sound.js';
 
 export function initCatchGame() {
@@ -112,7 +112,8 @@ export function initCatchGame() {
     rEl.textContent = msg;
     btn.disabled = false; btn.textContent = '\u25b6 PLAY AGAIN';
     say(score > 8 ? 'huge!' : 'again ay');
-    if (score > 8) { toast('NICE RUN \u2014 +$' + cash); SND.win(); }
+    if (score >= 15) { achieve('lead_master', 'LEAD MASTER \u2014 15+ IN ONE RUN'); SND.win(); }
+    else if (score > 8) { toast('NICE RUN \u2014 +' + cash + ' XP'); SND.win(); }
     if (score > 8) SND.win();
   }
 

@@ -4,7 +4,7 @@
 
 import { drawSprite, FR }        from './sprite.js';
 import { fitCanvas, canvasVis }  from './canvas.js';
-import { GAME, toast, REFIT }    from './state.js';
+import { GAME, toast, achieve, REFIT } from './state.js';
 import { SND }                   from './sound.js';
 
 /* Retro pixel-text icons instead of modern emoji */
@@ -131,7 +131,8 @@ export function initBuildGame() {
     var ln = ['shipped!', 'too easy', 'built different', 'sending it', 'boom', 'lets go'][(Math.random() * 6) | 0];
     say(ln);
     SND.win();
-    toast(builds === 1 ? 'ACHIEVEMENT \u2014 FIRST AGENT SHIPPED' : 'AGENT SHIPPED \u2014 LV ' + String(lv).padStart(2, '0'));
+    if (builds === 1) achieve('first_agent', 'FIRST AGENT SHIPPED');
+    else toast('AGENT SHIPPED \u2014 +' + amt + ' XP');
     running = false;
   }
 

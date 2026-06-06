@@ -6,7 +6,7 @@
  * Touch: tap left/right to steer, center to jump.
  */
 import { SND }          from './sound.js';
-import { GAME, toast }  from './state.js';
+import { GAME, toast, achieve } from './state.js';
 
 var CL = ['...XXXX.....','..XXXXXXXX...','.XXXXXXXXXXX.','XXXXXXXXXXXX.','.XXXXXXXXXX..'];
 var CS = ['..XXX..','..XXXX.','.XXXXXX','XXXXXXX','.XXXXX.'];
@@ -16,7 +16,7 @@ export function initHero() {
   if (!cv) return;
 
   var W = 0, H = 0, u = 4, roadY = 0, skylineY = 0;
-  var clouds = [], stars = [], drones = [], towers = [], dust = [], dataStreams = [];
+  var clouds = [], stars = [], drones = [], towers = [], dust = [];
   var car = null, playing = false, keys = {}, gameState = null;
   var touchL = false, touchR = false;
 
@@ -50,9 +50,6 @@ export function initHero() {
     stars = [];
     for (var i = 0; i < 25; i++) stars.push({ x: Math.random() * W, y: Math.random() * skylineY * 0.7, ph: Math.random() * 6.28, sz: 0.2 + Math.random() * 0.3 });
     drones = []; dust = [];
-    dataStreams = [];
-    for (var i = 0; i < 4; i++) dataStreams.push({ x: u * 20 + Math.random() * (W - u * 40), ph: Math.random() * 6.28, speed: 0.5 + Math.random() * 0.8 });
-
     /* AI district towers — two depth layers */
     towers = [];
     var bx = 0;
@@ -268,7 +265,7 @@ export function initHero() {
     var sc = gameState.score, cash = sc * 30;
     touchL = false; touchR = false;
     if (sc > 0) { GAME.addCash(cash); toast('MISSION COMPLETE \u2014 ' + sc + ' coins = $' + cash);
-      if (sc >= 10) { toast('ACHIEVEMENT \u2014 AGENT DEPLOYER'); SND.win(); } else SND.good(); }
+      if (sc >= 10) { achieve('agent_deployer', 'AGENT DEPLOYER \u2014 10+ COINS'); SND.win(); } else SND.good(); }
     car.x = gameState.carX; car.vx = 0; playing = false; gameState = null;
     var p = document.querySelector('.hero-poke');
     if (p) p.textContent = isMobile() ? 'tap the rig to deploy' : 'click the rig to deploy';
@@ -301,7 +298,7 @@ export function initHero() {
       }
 
       /* ── MOON / CELESTIAL BODY (hero visual element — must stay) ── */
-      var mx = W * 0.72, my = skylineY - u * 6, mr = u * 9;
+      var mx = W * 0.82, my = skylineY - u * 12, mr = u * 9;
       var mp = 1 + Math.sin(f * 0.8) * 0.08;
       /* outer glow */
       ctx.fillStyle = 'rgba(255,210,100,0.04)';
@@ -327,15 +324,6 @@ export function initHero() {
         ctx.globalAlpha = cl.a; drawCloud(ctx, cl.shape, cl.x, cl.y, cl.sc);
       }
       ctx.globalAlpha = 1;
-
-      /* ── data streams (vertical light beams from facilities) ── */
-      for (var di = 0; di < dataStreams.length; di++) {
-        var ds = dataStreams[di];
-        var dsy = skylineY + (roadY - skylineY) * 0.3;
-        var dsAlpha = 0.03 + 0.02 * Math.sin(f * ds.speed + ds.ph);
-        ctx.fillStyle = 'rgba(100,200,255,' + dsAlpha.toFixed(3) + ')';
-        ctx.fillRect(ds.x, 0, u * 0.3, dsy);
-      }
 
       /* ── AI district skyline (back layer) ── */
       for (var ti = 0; ti < towers.length; ti++) {

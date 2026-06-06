@@ -4,7 +4,7 @@
 
 import { drawSprite, FR }       from './sprite.js';
 import { fitCanvas, canvasVis } from './canvas.js';
-import { GAME, toast }           from './state.js';
+import { GAME, toast, achieve }   from './state.js';
 import { SND }                   from './sound.js';
 
 const QUESTIONS = [
@@ -158,7 +158,7 @@ export function initSolveGame() {
     pose = win ? 'happy' : 'idle';
     poseT = win ? 170 : 0;
 
-    if (win) { toast('LEVEL CLEAR \u2014 NICE ONE'); SND.win(); }
+    if (win) { achieve('quiz_ace', 'QUIZ ACE \u2014 4+ CORRECT'); SND.win(); }
   }
 
   /* --- next button --- */
