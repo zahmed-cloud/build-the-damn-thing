@@ -41,6 +41,32 @@ initWeeksMap();
 initEmail();
 initMarquee();
 
+/* --- Agent flow nodes (Mission Control section) --- */
+(function() {
+  var nodes = [].slice.call(document.querySelectorAll('.af-node'));
+  var detail = document.getElementById('afDetail');
+  if (!nodes.length || !detail) return;
+  var titleEl = detail.querySelector('.af-detail-title');
+  var descEl = detail.querySelector('.af-detail-desc');
+
+  nodes.forEach(function(n) {
+    function show() {
+      nodes.forEach(function(x) { x.classList.remove('active'); });
+      n.classList.add('active');
+      var label = n.querySelector('.af-label');
+      var info = n.getAttribute('data-info');
+      if (titleEl) titleEl.textContent = label ? label.textContent : '';
+      if (descEl) descEl.textContent = info || '';
+      detail.classList.add('has-info');
+      SND.tick();
+    }
+    n.onclick = show;
+    n.onkeydown = function(e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); show(); } };
+    n.setAttribute('role', 'button');
+    n.setAttribute('tabindex', '0');
+  });
+})();
+
 /* --- Arcade tabs --- */
 (function() {
   var tabs = [].slice.call(document.querySelectorAll('.arc-tab'));
